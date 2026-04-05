@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Система клиники v9.2</title>
+<title>Система клиники v9.3</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -26,7 +26,7 @@
   --anna-cloud-a:#fff8fb;
   --anna-cloud-b:#ffeaf3;
   --anna-cloud-c:#ffd9e8;
-  --anna-cloud-shadow:rgba(242,169,194,.24);
+  --anna-cloud-shadow:rgba(242,169,194,.22);
 
   --natalia-1:#f4f9ff;
   --natalia-2:#e4efff;
@@ -34,17 +34,16 @@
   --natalia-bubble-a:#ffffff;
   --natalia-bubble-b:#edf7ff;
   --natalia-bubble-line:rgba(149,185,235,.42);
-  --natalia-bubble-shadow:rgba(149,185,235,.22);
+  --natalia-bubble-shadow:rgba(149,185,235,.20);
 
-  --alexey-1:#0f1420;
-  --alexey-2:#141b29;
-  --alexey-3:#223049;
-  --alexey-4:#d9e6ff;
-  --alexey-accent:#72b2ff;
-  --alexey-accent-2:#9fd2ff;
-  --alexey-accent-soft:rgba(114,178,255,.14);
-  --alexey-accent-mid:rgba(114,178,255,.28);
-  --alexey-accent-strong:rgba(114,178,255,.54);
+  --alexey-1:#101722;
+  --alexey-2:#162131;
+  --alexey-3:#22334f;
+  --alexey-4:#e4efff;
+  --alexey-accent:#74b7ff;
+  --alexey-accent-2:#b6dbff;
+  --alexey-glow:rgba(116,183,255,.32);
+  --alexey-glow-soft:rgba(116,183,255,.14);
 
   --doctor-1:#f6f8fa;
   --doctor-2:#e8edf2;
@@ -234,7 +233,7 @@ body.role-doctor{
   z-index:1;
 }
 
-/* APP SHELL */
+/* APP */
 #app{
   min-height:100vh;
   display:none;
@@ -260,9 +259,7 @@ body.role-doctor{
   gap:10px;
   flex-wrap:wrap;
 }
-.user-name{
-  font-weight:800;
-}
+.user-name{font-weight:800}
 .top-btn{
   padding:10px 12px;
   border:none;
@@ -326,16 +323,15 @@ body.role-manager .top-btn.light{
 }
 
 /* CHAT */
-.chat-shell{
-  position:relative;
-}
+.chat-shell{position:relative}
 .chat-wrap{
   background:rgba(255,255,255,.72);
   border:1px solid var(--line);
   border-radius:22px;
   padding:12px;
   height:58vh;
-  overflow:auto;
+  overflow-y:auto;
+  overflow-x:hidden;
   box-shadow:var(--panel-shadow);
   backdrop-filter:blur(12px);
 }
@@ -361,9 +357,8 @@ body.role-manager .chat-wrap{
   from{opacity:0;transform:translateY(8px) scale(.985)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
-
 .msg{
-  max-width:min(78%,720px);
+  max-width:min(76%,560px);
   min-width:92px;
   padding:12px 14px;
   border-radius:22px;
@@ -384,167 +379,165 @@ body.role-manager .chat-wrap{
   font-size:12px;
   font-weight:800;
   margin-bottom:4px;
+  position:relative;
+  z-index:2;
 }
 .msg-text{
   font-size:14px;
+  position:relative;
+  z-index:2;
 }
 .msg-meta{
   margin-top:5px;
   font-size:11px;
   opacity:.75;
   text-align:right;
+  position:relative;
+  z-index:2;
 }
-/* ===== АЛЕКСЕЙ — ЯВНЫЙ НЕОН / ДУГИ / ВСПЫШКИ ===== */
+/* ===== АЛЕКСЕЙ — МОЩНЫЙ НЕОН БЕЗ ПРЯМОУГОЛЬНОЙ РАМКИ ===== */
 .msg.user-alexey{
   background:
-    radial-gradient(circle at 20% 20%, rgba(114,178,255,.08), transparent 42%),
-    linear-gradient(180deg, rgba(24,32,47,.98), rgba(12,18,28,.98));
+    radial-gradient(circle at 22% 18%, rgba(116,183,255,.10), transparent 38%),
+    linear-gradient(180deg, rgba(22,31,46,.98), rgba(12,18,28,.98));
   color:#eef4ff;
-  border:1px solid rgba(114,178,255,.30);
+  border:1px solid rgba(116,183,255,.24);
   box-shadow:
-    0 10px 26px rgba(0,0,0,.34),
-    inset 0 0 22px rgba(114,178,255,.08),
-    0 0 16px rgba(114,178,255,.12);
+    0 10px 24px rgba(0,0,0,.34),
+    inset 0 0 18px rgba(116,183,255,.07),
+    0 0 12px rgba(116,183,255,.10);
   text-shadow:
-    0 0 10px rgba(114,178,255,.18),
-    0 0 20px rgba(114,178,255,.08);
+    0 0 7px rgba(116,183,255,.15),
+    0 0 16px rgba(116,183,255,.08);
 }
 .msg.mine.user-alexey{border-radius:22px 22px 10px 22px}
 .msg.other.user-alexey{border-radius:22px 22px 22px 10px}
 
 .msg.user-alexey .fx-electric{
   position:absolute;
-  inset:-2px;
+  inset:0;
+  border-radius:inherit;
   pointer-events:none;
   overflow:visible;
 }
-
-.msg.user-alexey .fx-electric .edge-glow{
+.msg.user-alexey .fx-electric .inner-glow{
   position:absolute;
   inset:0;
   border-radius:inherit;
   box-shadow:
-    0 0 0 1px rgba(114,178,255,.24),
-    0 0 14px rgba(114,178,255,.16),
-    0 0 28px rgba(114,178,255,.10);
-  opacity:.9;
+    inset 0 0 16px rgba(116,183,255,.10),
+    inset 0 0 28px rgba(116,183,255,.05);
+  opacity:.92;
 }
-
 .msg.user-alexey .fx-electric .flash{
   position:absolute;
   inset:0;
   border-radius:inherit;
   background:
     linear-gradient(115deg,
-      transparent 0 24%,
-      rgba(114,178,255,.00) 34%,
-      rgba(114,178,255,.20) 44%,
-      rgba(255,255,255,.34) 49%,
-      rgba(114,178,255,.18) 55%,
-      transparent 66% 100%);
+      transparent 0 28%,
+      rgba(116,183,255,0) 36%,
+      rgba(116,183,255,.16) 44%,
+      rgba(255,255,255,.28) 49%,
+      rgba(116,183,255,.14) 54%,
+      transparent 64% 100%);
   opacity:0;
   mix-blend-mode:screen;
-  animation:alexeyFlash 5.8s infinite ease-in-out;
+  animation:alexeyFlash93 5.8s infinite ease-in-out;
 }
-
-.msg.user-alexey .fx-electric .spark{
+.msg.user-alexey .fx-electric .arc{
   position:absolute;
-  top:-5px;
-  width:26px;
-  height:10px;
-  border-top:2px solid rgba(159,210,255,.96);
+  top:-3px;
+  width:24px;
+  height:8px;
+  border-top:2px solid rgba(182,219,255,.96);
   border-radius:14px 14px 0 0;
   filter:
-    drop-shadow(0 0 4px rgba(114,178,255,.85))
-    drop-shadow(0 0 8px rgba(114,178,255,.50));
+    drop-shadow(0 0 4px rgba(116,183,255,.84))
+    drop-shadow(0 0 8px rgba(116,183,255,.48));
   opacity:0;
 }
-.msg.user-alexey .fx-electric .spark.s1{
-  left:8%;
-  animation:alexeySpark1 4.8s infinite ease-in-out;
+.msg.user-alexey .fx-electric .arc.a1{
+  left:10%;
+  animation:alexeyArc93_1 4.8s infinite ease-in-out;
 }
-.msg.user-alexey .fx-electric .spark.s2{
+.msg.user-alexey .fx-electric .arc.a2{
   left:44%;
   width:32px;
-  animation:alexeySpark2 5.6s 1.2s infinite ease-in-out;
+  animation:alexeyArc93_2 5.6s 1.2s infinite ease-in-out;
 }
-.msg.user-alexey .fx-electric .spark.s3{
-  left:76%;
-  width:20px;
-  animation:alexeySpark3 4.9s 2.3s infinite ease-in-out;
+.msg.user-alexey .fx-electric .arc.a3{
+  left:74%;
+  width:18px;
+  animation:alexeyArc93_3 4.9s 2.4s infinite ease-in-out;
 }
-
 .msg.user-alexey .fx-electric .bolt{
   position:absolute;
-  right:8px;
-  top:10px;
-  width:18px;
-  height:34px;
+  right:10px;
+  top:9px;
+  width:16px;
+  height:28px;
   opacity:0;
-  transform:skewX(-8deg);
-  background:
-    polygon;
-  clip-path:polygon(47% 0, 74% 0, 56% 34%, 82% 34%, 28% 100%, 42% 58%, 20% 58%);
-  background:linear-gradient(180deg, rgba(220,240,255,.98), rgba(114,178,255,.92));
+  clip-path:polygon(46% 0, 78% 0, 58% 35%, 82% 35%, 28% 100%, 42% 60%, 20% 60%);
+  background:linear-gradient(180deg, rgba(235,246,255,.98), rgba(116,183,255,.92));
   filter:
-    drop-shadow(0 0 6px rgba(114,178,255,.85))
-    drop-shadow(0 0 14px rgba(114,178,255,.42));
-  animation:alexeyBolt 7.2s 1.8s infinite ease-in-out;
+    drop-shadow(0 0 6px rgba(116,183,255,.80))
+    drop-shadow(0 0 14px rgba(116,183,255,.40));
+  animation:alexeyBolt93 7.1s 2s infinite ease-in-out;
 }
-
 .msg.user-alexey .fx-electric .pulse{
   position:absolute;
   inset:0;
   border-radius:inherit;
   background:
-    radial-gradient(circle at 22% 50%, rgba(114,178,255,.20), transparent 30%),
-    radial-gradient(circle at 78% 38%, rgba(114,178,255,.12), transparent 24%);
-  opacity:.16;
-  animation:alexeyPulse 3.8s infinite ease-in-out;
+    radial-gradient(circle at 26% 52%, rgba(116,183,255,.16), transparent 28%),
+    radial-gradient(circle at 78% 34%, rgba(116,183,255,.10), transparent 24%);
+  opacity:.14;
+  animation:alexeyPulse93 3.8s infinite ease-in-out;
 }
 
-@keyframes alexeyFlash{
-  0%,100%{opacity:0;transform:translateX(-12%)}
-  34%{opacity:0}
-  40%{opacity:.14}
-  44%{opacity:.34}
-  49%{opacity:.12}
+@keyframes alexeyFlash93{
+  0%,100%{opacity:0;transform:translateX(-10%)}
+  36%{opacity:0}
+  42%{opacity:.12}
+  46%{opacity:.28}
+  50%{opacity:.10}
   58%{opacity:0;transform:translateX(10%)}
 }
-@keyframes alexeySpark1{
+@keyframes alexeyArc93_1{
   0%,100%{opacity:0;transform:translateX(-10px) scaleX(.7)}
-  10%{opacity:0}
-  17%{opacity:1;transform:translateX(8px) scaleX(1)}
-  24%{opacity:.10;transform:translateX(18px) scaleX(.85)}
+  12%{opacity:0}
+  18%{opacity:1;transform:translateX(8px) scaleX(1)}
+  24%{opacity:.10;transform:translateX(18px) scaleX(.86)}
   32%{opacity:0}
 }
-@keyframes alexeySpark2{
+@keyframes alexeyArc93_2{
   0%,100%{opacity:0;transform:translateX(-8px) scaleX(.8)}
   24%{opacity:0}
-  31%{opacity:.95;transform:translateX(10px) scaleX(1.02)}
+  31%{opacity:.96;transform:translateX(10px) scaleX(1.03)}
   38%{opacity:.12;transform:translateX(22px) scaleX(.88)}
   46%{opacity:0}
 }
-@keyframes alexeySpark3{
+@keyframes alexeyArc93_3{
   0%,100%{opacity:0;transform:translateX(-7px) scaleX(.75)}
   48%{opacity:0}
   56%{opacity:.92;transform:translateX(8px) scaleX(1)}
   63%{opacity:.10;transform:translateX(16px) scaleX(.84)}
   70%{opacity:0}
 }
-@keyframes alexeyBolt{
-  0%,100%{opacity:0;transform:translateY(-6px) scale(.8)}
+@keyframes alexeyBolt93{
+  0%,100%{opacity:0;transform:translateY(-5px) scale(.82)}
   58%{opacity:0}
-  64%{opacity:.94;transform:translateY(0) scale(1)}
-  68%{opacity:.24}
+  64%{opacity:.96;transform:translateY(0) scale(1)}
+  68%{opacity:.22}
   72%{opacity:0}
 }
-@keyframes alexeyPulse{
+@keyframes alexeyPulse93{
   0%,100%{opacity:.08}
-  50%{opacity:.24}
+  50%{opacity:.22}
 }
 
-/* ===== АННА — КРАСИВЫЕ ОБЛАЧНЫЕ КЛАСТЕРЫ, КОТОРЫЕ СНОСИТ ВЕТРОМ ===== */
+/* ===== АННА — ОБЛАКА СНОСИТ К ЦЕНТРУ ЧАТА ===== */
 .msg.user-anna{
   background:linear-gradient(180deg, var(--anna-1), var(--anna-2));
   color:#5c3b4b;
@@ -560,12 +553,11 @@ body.role-manager .chat-wrap{
   position:absolute;
   left:8px;
   right:8px;
-  top:-16px;
-  height:30px;
+  top:-14px;
+  height:28px;
   pointer-events:none;
   overflow:visible;
 }
-
 .msg.user-anna .fx-cloudline .cloud{
   position:absolute;
   width:34px;
@@ -599,36 +591,68 @@ body.role-manager .chat-wrap{
   width:14px; height:12px;
 }
 
-.msg.user-anna .fx-cloudline .c1{left:-2%; top:6px; animation:annaWind1 7.2s infinite ease-in-out;}
-.msg.user-anna .fx-cloudline .c2{left:20%; top:2px; transform:scale(.92); animation:annaWind2 7.8s .8s infinite ease-in-out;}
-.msg.user-anna .fx-cloudline .c3{left:44%; top:6px; transform:scale(1.04); animation:annaWind3 7.0s 1.6s infinite ease-in-out;}
-.msg.user-anna .fx-cloudline .c4{left:70%; top:1px; transform:scale(.88); animation:annaWind4 7.6s 2.3s infinite ease-in-out;}
+/* other = слева, значит ветер вправо */
+.msg-row.other .msg.user-anna .fx-cloudline .c1{left:0%; top:6px; animation:annaWindRight1 7.2s infinite ease-in-out;}
+.msg-row.other .msg.user-anna .fx-cloudline .c2{left:20%; top:2px; transform:scale(.92); animation:annaWindRight2 7.8s .8s infinite ease-in-out;}
+.msg-row.other .msg.user-anna .fx-cloudline .c3{left:44%; top:6px; transform:scale(1.04); animation:annaWindRight3 7.0s 1.6s infinite ease-in-out;}
+.msg-row.other .msg.user-anna .fx-cloudline .c4{left:68%; top:1px; transform:scale(.88); animation:annaWindRight4 7.6s 2.3s infinite ease-in-out;}
 
-@keyframes annaWind1{
+/* mine = справа, значит ветер влево */
+.msg-row.mine .msg.user-anna .fx-cloudline .c1{left:0%; top:6px; animation:annaWindLeft1 7.2s infinite ease-in-out;}
+.msg-row.mine .msg.user-anna .fx-cloudline .c2{left:20%; top:2px; transform:scale(.92); animation:annaWindLeft2 7.8s .8s infinite ease-in-out;}
+.msg-row.mine .msg.user-anna .fx-cloudline .c3{left:44%; top:6px; transform:scale(1.04); animation:annaWindLeft3 7.0s 1.6s infinite ease-in-out;}
+.msg-row.mine .msg.user-anna .fx-cloudline .c4{left:68%; top:1px; transform:scale(.88); animation:annaWindLeft4 7.6s 2.3s infinite ease-in-out;}
+
+@keyframes annaWindRight1{
   0%,100%{transform:translate(0,0) scale(1);opacity:.26}
   14%{opacity:.96}
-  52%{transform:translate(18px,-2px) scale(1.04)}
-  82%{transform:translate(42px,-10px) scale(1.14);opacity:.30}
+  52%{transform:translate(10px,-2px) scale(1.04)}
+  82%{transform:translate(20px,-9px) scale(1.12);opacity:.30}
 }
-@keyframes annaWind2{
+@keyframes annaWindRight2{
   0%,100%{transform:translate(0,0) scale(.92);opacity:.20}
   16%{opacity:.90}
-  54%{transform:translate(20px,-3px) scale(.98)}
-  84%{transform:translate(48px,-12px) scale(1.10);opacity:.28}
+  54%{transform:translate(9px,-3px) scale(.98)}
+  84%{transform:translate(18px,-10px) scale(1.08);opacity:.28}
 }
-@keyframes annaWind3{
+@keyframes annaWindRight3{
   0%,100%{transform:translate(0,0) scale(1.04);opacity:.22}
   12%{opacity:.92}
-  50%{transform:translate(16px,-2px) scale(1.08)}
-  80%{transform:translate(40px,-10px) scale(1.18);opacity:.26}
+  50%{transform:translate(10px,-2px) scale(1.08)}
+  80%{transform:translate(18px,-8px) scale(1.14);opacity:.26}
 }
-@keyframes annaWind4{
+@keyframes annaWindRight4{
   0%,100%{transform:translate(0,0) scale(.88);opacity:.20}
   18%{opacity:.88}
-  56%{transform:translate(18px,-3px) scale(.96)}
-  86%{transform:translate(46px,-11px) scale(1.08);opacity:.24}
+  56%{transform:translate(8px,-3px) scale(.96)}
+  86%{transform:translate(16px,-9px) scale(1.06);opacity:.24}
 }
-/* ===== НАТАЛИЯ — ПУЗЫРЬКИ ДАЛЬШЕ ОТ СООБЩЕНИЯ ===== */
+
+@keyframes annaWindLeft1{
+  0%,100%{transform:translate(0,0) scale(1);opacity:.26}
+  14%{opacity:.96}
+  52%{transform:translate(-10px,-2px) scale(1.04)}
+  82%{transform:translate(-20px,-9px) scale(1.12);opacity:.30}
+}
+@keyframes annaWindLeft2{
+  0%,100%{transform:translate(0,0) scale(.92);opacity:.20}
+  16%{opacity:.90}
+  54%{transform:translate(-9px,-3px) scale(.98)}
+  84%{transform:translate(-18px,-10px) scale(1.08);opacity:.28}
+}
+@keyframes annaWindLeft3{
+  0%,100%{transform:translate(0,0) scale(1.04);opacity:.22}
+  12%{opacity:.92}
+  50%{transform:translate(-10px,-2px) scale(1.08)}
+  80%{transform:translate(-18px,-8px) scale(1.14);opacity:.26}
+}
+@keyframes annaWindLeft4{
+  0%,100%{transform:translate(0,0) scale(.88);opacity:.20}
+  18%{opacity:.88}
+  56%{transform:translate(-8px,-3px) scale(.96)}
+  86%{transform:translate(-16px,-9px) scale(1.06);opacity:.24}
+}
+/* ===== НАТАЛИЯ — ПУЗЫРЬКИ ЛЕТЯТ К ЦЕНТРУ ЧАТА, НЕ НАРУЖУ ===== */
 .msg.user-natalia{
   background:linear-gradient(180deg, var(--natalia-1), var(--natalia-2));
   color:#35506e;
@@ -642,65 +666,110 @@ body.role-manager .chat-wrap{
 
 .msg.user-natalia .fx-bubbleline{
   position:absolute;
-  left:6px;
-  right:6px;
-  top:-20px;
-  height:42px;
+  left:8px;
+  right:8px;
+  top:-18px;
+  height:38px;
   pointer-events:none;
   overflow:visible;
 }
 .msg.user-natalia .fx-bubbleline span{
   position:absolute;
-  bottom:2px;
+  bottom:0;
   border-radius:50%;
   background:
-    radial-gradient(circle at 30% 30%, var(--natalia-bubble-a), var(--natalia-bubble-b) 58%, rgba(255,255,255,.18));
+    radial-gradient(circle at 30% 30%, var(--natalia-bubble-a), var(--natalia-bubble-b) 58%, rgba(255,255,255,.16));
   border:1px solid var(--natalia-bubble-line);
   box-shadow:
     0 0 12px var(--natalia-bubble-shadow),
-    inset 0 0 7px rgba(255,255,255,.34);
+    inset 0 0 6px rgba(255,255,255,.34);
   opacity:.96;
 }
-.msg.user-natalia .fx-bubbleline .b1{left:2%; width:11px; height:11px; animation:nBubble1 5.2s infinite ease-in-out;}
-.msg.user-natalia .fx-bubbleline .b2{left:24%; width:8px; height:8px; animation:nBubble2 5.8s .8s infinite ease-in-out;}
-.msg.user-natalia .fx-bubbleline .b3{left:46%; width:13px; height:13px; animation:nBubble3 5.4s 1.6s infinite ease-in-out;}
-.msg.user-natalia .fx-bubbleline .b4{left:68%; width:9px; height:9px; animation:nBubble4 6s 2.1s infinite ease-in-out;}
-.msg.user-natalia .fx-bubbleline .b5{left:88%; width:10px; height:10px; animation:nBubble5 5.1s 2.9s infinite ease-in-out;}
 
-@keyframes nBubble1{
+/* other = слева, летят вправо */
+.msg-row.other .msg.user-natalia .b1{left:4%;  width:10px; height:10px; animation:nBubbleRight1 5.2s infinite ease-in-out;}
+.msg-row.other .msg.user-natalia .b2{left:24%; width:8px;  height:8px;  animation:nBubbleRight2 5.8s .8s infinite ease-in-out;}
+.msg-row.other .msg.user-natalia .b3{left:46%; width:12px; height:12px; animation:nBubbleRight3 5.4s 1.6s infinite ease-in-out;}
+.msg-row.other .msg.user-natalia .b4{left:68%; width:9px;  height:9px;  animation:nBubbleRight4 6s 2.1s infinite ease-in-out;}
+.msg-row.other .msg.user-natalia .b5{left:86%; width:10px; height:10px; animation:nBubbleRight5 5.1s 2.9s infinite ease-in-out;}
+
+/* mine = справа, летят влево */
+.msg-row.mine .msg.user-natalia .b1{left:4%;  width:10px; height:10px; animation:nBubbleLeft1 5.2s infinite ease-in-out;}
+.msg-row.mine .msg.user-natalia .b2{left:24%; width:8px;  height:8px;  animation:nBubbleLeft2 5.8s .8s infinite ease-in-out;}
+.msg-row.mine .msg.user-natalia .b3{left:46%; width:12px; height:12px; animation:nBubbleLeft3 5.4s 1.6s infinite ease-in-out;}
+.msg-row.mine .msg.user-natalia .b4{left:68%; width:9px;  height:9px;  animation:nBubbleLeft4 6s 2.1s infinite ease-in-out;}
+.msg-row.mine .msg.user-natalia .b5{left:86%; width:10px; height:10px; animation:nBubbleLeft5 5.1s 2.9s infinite ease-in-out;}
+
+@keyframes nBubbleRight1{
   0%,100%{transform:translate(0,0) scale(.86);opacity:.18}
   16%{opacity:.96}
-  48%{transform:translate(8px,-10px) scale(1.05)}
-  74%{transform:translate(16px,-24px) scale(1.18);opacity:.34}
-  88%{transform:translate(20px,-30px) scale(.24);opacity:0}
+  48%{transform:translate(8px,-8px) scale(1.04)}
+  74%{transform:translate(14px,-18px) scale(1.14);opacity:.32}
+  88%{transform:translate(18px,-24px) scale(.22);opacity:0}
 }
-@keyframes nBubble2{
+@keyframes nBubbleRight2{
   0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
   18%{opacity:.92}
-  50%{transform:translate(-4px,-9px) scale(1.02)}
-  76%{transform:translate(-12px,-22px) scale(1.16);opacity:.30}
-  90%{transform:translate(-16px,-28px) scale(.22);opacity:0}
+  50%{transform:translate(6px,-8px) scale(1.02)}
+  76%{transform:translate(12px,-17px) scale(1.10);opacity:.28}
+  90%{transform:translate(16px,-23px) scale(.20);opacity:0}
 }
-@keyframes nBubble3{
+@keyframes nBubbleRight3{
   0%,100%{transform:translate(0,0) scale(.88);opacity:.18}
   14%{opacity:.96}
-  46%{transform:translate(10px,-10px) scale(1.06)}
-  72%{transform:translate(22px,-26px) scale(1.24);opacity:.36}
-  88%{transform:translate(28px,-34px) scale(.24);opacity:0}
+  46%{transform:translate(10px,-8px) scale(1.05)}
+  72%{transform:translate(18px,-20px) scale(1.18);opacity:.34}
+  88%{transform:translate(24px,-27px) scale(.22);opacity:0}
 }
-@keyframes nBubble4{
+@keyframes nBubbleRight4{
   0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
   20%{opacity:.90}
-  54%{transform:translate(6px,-9px) scale(1.04)}
-  78%{transform:translate(16px,-22px) scale(1.16);opacity:.30}
-  92%{transform:translate(20px,-29px) scale(.22);opacity:0}
+  54%{transform:translate(7px,-8px) scale(1.03)}
+  78%{transform:translate(14px,-18px) scale(1.12);opacity:.28}
+  92%{transform:translate(18px,-24px) scale(.20);opacity:0}
 }
-@keyframes nBubble5{
+@keyframes nBubbleRight5{
   0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
   18%{opacity:.92}
-  52%{transform:translate(-6px,-8px) scale(1.03)}
-  80%{transform:translate(-18px,-23px) scale(1.18);opacity:.28}
-  94%{transform:translate(-24px,-30px) scale(.20);opacity:0}
+  52%{transform:translate(8px,-7px) scale(1.03)}
+  80%{transform:translate(14px,-18px) scale(1.14);opacity:.26}
+  94%{transform:translate(18px,-24px) scale(.18);opacity:0}
+}
+
+@keyframes nBubbleLeft1{
+  0%,100%{transform:translate(0,0) scale(.86);opacity:.18}
+  16%{opacity:.96}
+  48%{transform:translate(-8px,-8px) scale(1.04)}
+  74%{transform:translate(-14px,-18px) scale(1.14);opacity:.32}
+  88%{transform:translate(-18px,-24px) scale(.22);opacity:0}
+}
+@keyframes nBubbleLeft2{
+  0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
+  18%{opacity:.92}
+  50%{transform:translate(-6px,-8px) scale(1.02)}
+  76%{transform:translate(-12px,-17px) scale(1.10);opacity:.28}
+  90%{transform:translate(-16px,-23px) scale(.20);opacity:0}
+}
+@keyframes nBubbleLeft3{
+  0%,100%{transform:translate(0,0) scale(.88);opacity:.18}
+  14%{opacity:.96}
+  46%{transform:translate(-10px,-8px) scale(1.05)}
+  72%{transform:translate(-18px,-20px) scale(1.18);opacity:.34}
+  88%{transform:translate(-24px,-27px) scale(.22);opacity:0}
+}
+@keyframes nBubbleLeft4{
+  0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
+  20%{opacity:.90}
+  54%{transform:translate(-7px,-8px) scale(1.03)}
+  78%{transform:translate(-14px,-18px) scale(1.12);opacity:.28}
+  92%{transform:translate(-18px,-24px) scale(.20);opacity:0}
+}
+@keyframes nBubbleLeft5{
+  0%,100%{transform:translate(0,0) scale(.86);opacity:.16}
+  18%{opacity:.92}
+  52%{transform:translate(-8px,-7px) scale(1.03)}
+  80%{transform:translate(-14px,-18px) scale(1.14);opacity:.26}
+  94%{transform:translate(-18px,-24px) scale(.18);opacity:0}
 }
 
 /* ===== ОСТАЛЬНЫЕ РОЛИ ===== */
@@ -782,29 +851,6 @@ body.role-manager .task-form{
   margin:0 0 10px;
   font-size:18px;
 }
-
-.form-row{margin-bottom:10px}
-.form-row label{
-  display:block;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:700;
-}
-.form-row input,
-.form-row textarea,
-.form-row select{
-  width:100%;
-  padding:12px 13px;
-  border:1px solid #ccc;
-  border-radius:12px;
-  font-size:14px;
-  outline:none;
-}
-.form-row textarea{
-  min-height:90px;
-  resize:vertical;
-}
-
 .tasks-list{
   background:rgba(255,255,255,.78);
   border:1px solid var(--line);
@@ -818,683 +864,426 @@ body.role-manager .tasks-list{
   border-color:#242b38;
 }
 
-.task-card{
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:12px;
-  margin-bottom:10px;
-  background:rgba(255,255,255,.7);
-  transition:transform .16s ease, box-shadow .16s ease;
-}
-.task-card:hover{
-  transform:translateY(-1px);
-  box-shadow:0 10px 24px rgba(0,0,0,.08);
-}
-body.role-manager .task-card{
-  background:rgba(28,33,44,.9);
-  border-color:#2a3240;
-}
-.task-title{
-  font-size:16px;
-  font-weight:800;
-  margin-bottom:6px;
-}
-.task-desc{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.45;
-  white-space:pre-wrap;
-}
-.badge{
-  display:inline-flex;
-  align-items:center;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-}
-.badge.author{background:#f0e7e2;color:#564b46}
-.badge.assignee{background:#e6eef9;color:#324762}
-.badge.status-new{background:var(--warn);color:var(--warn-text)}
-.badge.status-progress{background:var(--progress);color:var(--progress-text)}
-.badge.status-done{background:var(--success);color:var(--success-text)}
-.task-actions{
-  margin-top:10px;
+.task-row{
   display:flex;
-  gap:8px;
+  gap:10px;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.task-row:last-child{border-bottom:none}
+
+.task-title{font-weight:600}
+.task-meta{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.task-actions{
+  display:flex;
+  gap:6px;
 }
 .task-btn{
-  border:none;
+  border:1px solid var(--line);
+  background:#fff;
   border-radius:10px;
-  padding:8px 12px;
+  padding:6px 10px;
   cursor:pointer;
   font-size:12px;
-  font-weight:700;
+}
+.task-btn.primary{
   background:#111;
   color:#fff;
+  border-color:#111;
 }
-.task-btn.light{
-  background:#e8e8e8;
-  color:#222;
-}
-/* ===== SETTINGS ===== */
-.settings-panel{
-  background:rgba(255,255,255,.78);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:16px;
-  backdrop-filter:blur(10px);
-  box-shadow:var(--panel-shadow);
-}
-body.role-manager .settings-panel{
-  background:rgba(21,25,35,.9);
-  border-color:#242b38;
-}
-.settings-panel h3{
-  margin:0 0 10px;
-  font-size:18px;
-}
-.settings-panel p{
-  margin:0 0 10px;
-  font-size:13px;
-  color:var(--muted);
-  line-height:1.45;
-}
-.settings-row{margin-bottom:10px}
-.settings-row label{
-  display:block;
-  margin-bottom:6px;
-  font-size:12px;
-  font-weight:700;
-}
-.settings-row input{
-  width:100%;
-  padding:11px 12px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  font-size:13px;
-  outline:none;
-}
-.settings-actions{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
+body.role-manager .task-btn{
+  background:#1f2430;
+  border-color:#2b3342;
+  color:#dbe7ff;
 }
 
-/* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:rgba(0,0,0,.32);
-  backdrop-filter:blur(6px);
-  z-index:20;
-}
-.modal.active{display:flex}
-.modal-card{
-  width:100%;
-  max-width:380px;
-  background:var(--bg-soft);
-  border-radius:22px;
-  padding:16px;
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
-  border:1px solid var(--line);
-}
-.modal-card h4{
-  margin:0 0 8px;
-  font-size:18px;
-}
-.modal-card p{
-  margin:0 0 10px;
-  font-size:13px;
-  color:var(--muted);
-  line-height:1.45;
-}
-.modal-card .task-btn{
-  margin-top:6px;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width:600px){
-  .msg{
-    max-width:84%;
-    padding:12px 13px;
-    border-radius:20px;
+/* MOBILE */
+@media (max-width:900px){
+  body{padding:10px}
+  .app{padding:12px}
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
   }
-  .msg.mine.user-anna,
-  .msg.mine.user-natalia,
-  .msg.mine.user-alexey,
-  .msg.mine.user-doctor,
-  .msg.mine.user-mikhail{
-    border-radius:20px 20px 10px 20px;
-  }
-  .msg.other.user-anna,
-  .msg.other.user-natalia,
-  .msg.other.user-alexey,
-  .msg.other.user-doctor,
-  .msg.other.user-mikhail{
-    border-radius:20px 20px 20px 10px;
-  }
-
-  /* Анна — компактнее облака */
-  .msg.user-anna .fx-cloudline{
-    top:-12px;
-    height:24px;
-  }
-  .msg.user-anna .fx-cloudline .cloud{
-    transform:scale(.78);
-  }
-
-  /* Наталия — пузырьки выше */
-  .msg.user-natalia .fx-bubbleline{
-    top:-24px;
-    height:48px;
+  .topbar{width:100%}
+  .chat{
+    padding:10px;
+    min-height:60vh;
   }
 }
 
-/* ===== BODY CLOSE STYLE ===== */
+/* ===== JS ===== */
 </style>
 </head>
-
-<body>
-
-<!-- LOGIN -->
-<div id="login">
-  <div class="card">
-    <h2>Вход</h2>
-    <p>Чат и задачи клиники.</p>
-
-    <button onclick="loginAs('anna')">Анна</button>
-    <button onclick="loginAs('natalia')">Наталия</button>
-    <button onclick="loginAs('alexey')">Алексей</button>
-    <button onclick="loginAs('mikhail')">Михаил</button>
-    <button onclick="loginAs('doctor')">Дарья</button>
-    <button onclick="loginAs('doctor')">Дмитрий</button>
-
-    <button class="small-btn" onclick="openSettings()">Настройки подключения</button>
-
-    <div id="loginError" class="error-box"></div>
-    <div class="note">
-      Для работы нужны две таблицы в Supabase:<br/>
-      1. messages<br/>
-      2. tasks
-    </div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-  <div class="top">
-    <div class="title">Система клиники v9.2</div>
-    <div class="top-right">
-      <div class="user-name" id="userName"></div>
-      <button class="top-btn light" onclick="reconnect()">Переподключить</button>
-      <button class="top-btn light" onclick="openSettings()">Настройки</button>
-      <button class="top-btn" onclick="logout()">Выйти</button>
+<body class="role-anna">
+<div class="app">
+  <div class="header">
+    <div class="title">Система клиники v9.3</div>
+    <div class="topbar">
+      <span id="currentUser">Анна</span>
+      <button id="reconnectBtn" class="ghost">Переподключить</button>
+      <button id="settingsBtn" class="ghost">Настройки</button>
+      <button id="logoutBtn" class="black">Выйти</button>
     </div>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('chat')">Чат</button>
-    <button class="tab-btn" onclick="switchTab('tasks')">Задачи</button>
+    <div class="tab active" data-tab="chat">Чат</div>
+    <div class="tab" data-tab="tasks">Задачи</div>
   </div>
 
-  <!-- CHAT -->
-  <div id="chatSection" class="section active">
-    <div class="chat-shell">
-      <div class="chat-wrap" id="chatWrap"></div>
+  <div id="chatTab">
+    <div id="chat" class="chat"></div>
 
-      <div class="input-wrap">
-        <input id="msgInput" placeholder="Введите сообщение"/>
-        <button class="send-btn" onclick="sendMessage()">Отправить</button>
-      </div>
-
-      <div class="status-line" id="statusLine"></div>
+    <div class="input-wrap">
+      <input id="messageInput" placeholder="Введите сообщение" />
+      <button id="sendBtn" class="send-btn">Отправить</button>
     </div>
+    <div id="status" class="status-line">Подключено</div>
   </div>
 
-  <!-- TASKS -->
-  <div id="tasksSection" class="section">
+  <div id="tasksTab" style="display:none">
     <div class="tasks-layout">
-
       <div class="task-form">
         <h3>Новая задача</h3>
-
-        <div class="form-row">
-          <label>Заголовок</label>
-          <input id="taskTitle"/>
-        </div>
-
-        <div class="form-row">
-          <label>Описание</label>
-          <textarea id="taskDesc"></textarea>
-        </div>
-
-        <div class="form-row">
-          <label>Кому</label>
-          <select id="taskAssignee">
-            <option value="Анна">Анна</option>
-            <option value="Наталия">Наталия</option>
-            <option value="Алексей">Алексей</option>
-            <option value="Михаил">Михаил</option>
-            <option value="Дарья">Дарья</option>
-            <option value="Дмитрий">Дмитрий</option>
-          </select>
-        </div>
-
-        <button class="task-btn" onclick="createTask()">Создать</button>
+        <input id="taskTitle" placeholder="Название" style="width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid #ccc">
+        <button id="addTaskBtn" class="task-btn primary">Добавить</button>
       </div>
-
       <div class="tasks-list">
-        <h3>Список задач</h3>
+        <h3>Список</h3>
         <div id="tasksList"></div>
       </div>
-
     </div>
-  </div>
-</div>
-
-<!-- SETTINGS -->
-<div id="settingsModal" class="modal">
-  <div class="modal-card">
-    <h4>Настройки подключения</h4>
-
-    <div class="settings-row">
-      <label>SUPABASE URL</label>
-      <input id="supabaseUrl"/>
-    </div>
-
-    <div class="settings-row">
-      <label>SUPABASE KEY</label>
-      <input id="supabaseKey"/>
-    </div>
-
-    <div class="settings-actions">
-      <button class="task-btn" onclick="saveSettings()">Сохранить</button>
-      <button class="task-btn light" onclick="closeSettings()">Отмена</button>
-    </div>
-  </div>
-</div>
-
-<!-- ERROR MODAL -->
-<div id="errorModal" class="modal">
-  <div class="modal-card">
-    <h4>Ошибка подключения</h4>
-    <p id="errorText"></p>
-    <button class="task-btn" onclick="closeError()">Закрыть</button>
   </div>
 </div>
 
 <script>
-const USERS = {
-  anna:     { label: "Анна",     className: "user-anna",    bodyClass: "role-admin-anna",   canChat: true  },
-  natalia:  { label: "Наталия",  className: "user-natalia", bodyClass: "role-admin-natalia",canChat: true  },
-  alexey:   { label: "Алексей",  className: "user-alexey",  bodyClass: "role-manager",      canChat: true  },
-  mikhail:  { label: "Михаил",   className: "user-mikhail", bodyClass: "role-chief",        canChat: false },
-  doctor:   { label: "Дарья",    className: "user-doctor",  bodyClass: "role-doctor",       canChat: false }
-};
+const SUPABASE_URL = "https://yzaqdjgkvobfxldnxbqb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_qWswXBaePAA0IQCK8nCylg_rh-bhhaF";
 
-let currentUserKey = null;
-let currentUser = null;
-let currentTab = "chat";
-let sb = null;
-let chatChannel = null;
-let taskChannel = null;
-let messagesCache = [];
-let tasksCache = [];
+let currentUser = "Анна";
 
-function $(id){ return document.getElementById(id); }
+const chat = document.getElementById("chat");
+const input = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const status = document.getElementById("status");
 
-function openSettings(){
-  $("supabaseUrl").value = localStorage.getItem("clinic_supabase_url") || "";
-  $("supabaseKey").value = localStorage.getItem("clinic_supabase_key") || "";
-  $("settingsModal").classList.add("active");
-}
-function closeSettings(){
-  $("settingsModal").classList.remove("active");
-}
-function showError(text){
-  $("errorText").textContent = text || "Неизвестная ошибка";
-  $("errorModal").classList.add("active");
-}
-function closeError(){
-  $("errorModal").classList.remove("active");
-}
-
-function saveSettings(){
-  const url = $("supabaseUrl").value.trim();
-  const key = $("supabaseKey").value.trim();
-
-  if(!url || !key){
-    showError("Заполни URL и KEY.");
-    return;
-  }
-
-  localStorage.setItem("clinic_supabase_url", url);
-  localStorage.setItem("clinic_supabase_key", key);
-  closeSettings();
-
-  if(currentUserKey){
-    reconnect();
-  }
-}
-
-function getSettings(){
-  return {
-    url: localStorage.getItem("clinic_supabase_url") || "",
-    key: localStorage.getItem("clinic_supabase_key") || ""
-  };
-}
-
-function createClient(){
-  const cfg = getSettings();
-  if(!cfg.url || !cfg.key){
-    throw new Error("Сначала укажи настройки подключения.");
-  }
-  if(!window.supabase || !window.supabase.createClient){
-    throw new Error("Библиотека Supabase не загрузилась.");
-  }
-  return window.supabase.createClient(cfg.url, cfg.key);
-}
-
-async function stopRealtime(){
-  if(chatChannel && sb){
-    try{ await sb.removeChannel(chatChannel); }catch(e){}
-  }
-  if(taskChannel && sb){
-    try{ await sb.removeChannel(taskChannel); }catch(e){}
-  }
-  chatChannel = null;
-  taskChannel = null;
-}
-
-function loginAs(key){
-  currentUserKey = key;
-  currentUser = USERS[key];
-  document.body.className = currentUser.bodyClass;
-
-  $("login").style.display = "none";
-  $("app").style.display = "block";
-  $("userName").textContent = currentUser.label;
-
-  if(!currentUser.canChat){
-    switchTab("tasks");
-  }else{
-    switchTab("chat");
-  }
-
-  reconnect();
-}
-
-function logout(){
-  stopRealtime();
-  sb = null;
-  currentUserKey = null;
-  currentUser = null;
-  document.body.className = "";
-  $("login").style.display = "flex";
-  $("app").style.display = "none";
-  $("chatWrap").innerHTML = "";
-  $("tasksList").innerHTML = "";
-  $("statusLine").textContent = "";
-}
-
-function switchTab(tab){
-  currentTab = tab;
-  const buttons = document.querySelectorAll(".tab-btn");
-  buttons.forEach((btn, i)=>{
-    const isChatBtn = i === 0;
-    btn.classList.toggle("active", (tab === "chat" && isChatBtn) || (tab === "tasks" && !isChatBtn));
-  });
-
-  $("chatSection").classList.toggle("active", tab === "chat");
-  $("tasksSection").classList.toggle("active", tab === "tasks");
-}
-
-function makeEffectsFor(userClass){
-  if(userClass === "user-anna"){
-    return `
-      <div class="fx-cloudline">
-        <span class="cloud c1"><i></i></span>
-        <span class="cloud c2"><i></i></span>
-        <span class="cloud c3"><i></i></span>
-        <span class="cloud c4"><i></i></span>
-      </div>
-    `;
-  }
-  if(userClass === "user-natalia"){
-    return `
-      <div class="fx-bubbleline">
-        <span class="b1"></span>
-        <span class="b2"></span>
-        <span class="b3"></span>
-        <span class="b4"></span>
-        <span class="b5"></span>
-      </div>
-    `;
-  }
-  if(userClass === "user-alexey"){
-    return `
-      <div class="fx-electric">
-        <span class="edge-glow"></span>
-        <span class="flash"></span>
-        <span class="spark s1"></span>
-        <span class="spark s2"></span>
-        <span class="spark s3"></span>
-        <span class="bolt"></span>
-        <span class="pulse"></span>
-      </div>
-    `;
-  }
-  return "";
-}
-
-function formatTime(iso){
-  if(!iso) return "";
-  const d = new Date(iso);
-  if(Number.isNaN(d.getTime())) return "";
-  return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-}
-
-function renderMessages(){
-  const wrap = $("chatWrap");
-  wrap.innerHTML = `<div class="day-label">Сегодня</div>`;
-
-  messagesCache.forEach(row=>{
-    const mine = currentUser && row.user === currentUser.label;
-    const userClass =
-      row.user === "Анна" ? "user-anna" :
-      row.user === "Наталия" ? "user-natalia" :
-      row.user === "Алексей" ? "user-alexey" :
-      row.user === "Михаил" ? "user-mikhail" :
-      "user-doctor";
-
-    const line = document.createElement("div");
-    line.className = `msg-row ${mine ? "mine" : "other"}`;
-
-    const msg = document.createElement("div");
-    msg.className = `msg ${mine ? "mine" : "other"} ${userClass}`;
-    msg.innerHTML = `
-      ${makeEffectsFor(userClass)}
-      <div class="msg-head">${row.user || ""}</div>
-      <div class="msg-text">${escapeHtml(row.text || "")}</div>
-      <div class="msg-meta">${formatTime(row.created_at)}</div>
-    `;
-
-    line.appendChild(msg);
-    wrap.appendChild(line);
-  });
-
-  wrap.scrollTop = wrap.scrollHeight;
-}
-
-function renderTasks(){
-  const list = $("tasksList");
-  if(!tasksCache.length){
-    list.innerHTML = `<div style="color:var(--muted);font-size:14px;">Задач пока нет.</div>`;
-    return;
-  }
-
-  list.innerHTML = tasksCache.map(task=>{
-    const statusClass =
-      task.status === "done" ? "status-done" :
-      task.status === "progress" ? "status-progress" :
-      "status-new";
-
-    const statusText =
-      task.status === "done" ? "Завершена" :
-      task.status === "progress" ? "В работе" :
-      "Новая";
-
-    return `
-      <div class="task-card">
-        <div class="task-title">${escapeHtml(task.title || "Без названия")}</div>
-        <div class="task-desc">${escapeHtml(task.description || "Без описания")}</div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="badge author">Поставил: ${escapeHtml(task.author || "")}</span>
-          <span class="badge assignee">Ответственный: ${escapeHtml(task.assignee || "")}</span>
-          <span class="badge ${statusClass}">${statusText}</span>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-async function reconnect(){
-  if(!currentUser) return;
-
-  try{
-    $("statusLine").textContent = "Подключение...";
-    await stopRealtime();
-    sb = createClient();
-
-    if(currentUser.canChat){
-      await loadMessages();
-      startMessagesRealtime();
-    }else{
-      $("chatWrap").innerHTML = `<div class="day-label">Чат отключен</div>`;
-    }
-
-    await loadTasks();
-    startTasksRealtime();
-
-    $("statusLine").textContent = "Подключено";
-  }catch(err){
-    $("statusLine").textContent = "Ошибка подключения";
-    showError(err.message || String(err));
-  }
-}
+/* ===== FIX: realtime polling (вместо подписок) ===== */
+let lastLoadedId = 0;
 
 async function loadMessages(){
-  const { data, error } = await sb
-    .from("messages")
-    .select("*")
-    .order("id", { ascending: true })
-    .limit(300);
+  try{
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/messages?select=*&order=id.asc`,
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
 
-  if(error) throw new Error("Не удалось загрузить сообщения: " + error.message);
+    const data = await res.json();
 
-  messagesCache = Array.isArray(data) ? data : [];
-  renderMessages();
+    if(!Array.isArray(data)) return;
+
+    chat.innerHTML = "";
+
+    data.forEach(m=>{
+      renderMessage(m);
+      lastLoadedId = Math.max(lastLoadedId, m.id || 0);
+    });
+
+    chat.scrollTop = chat.scrollHeight;
+
+    status.textContent = "Подключено";
+  }catch(e){
+    status.textContent = "Ошибка подключения";
+  }
 }
 
-async function loadTasks(){
-  const { data, error } = await sb
-    .from("tasks")
-    .select("*")
-    .order("id", { ascending: false })
-    .limit(200);
+/* автообновление */
+setInterval(loadMessages, 2000);
 
-  if(error) throw new Error("Не удалось загрузить задачи: " + error.message);
-
-  tasksCache = Array.isArray(data) ? data : [];
-  renderTasks();
-}
-
-function startMessagesRealtime(){
-  chatChannel = sb
-    .channel("messages-live-v92")
-    .on("postgres_changes", {
-      event: "*",
-      schema: "public",
-      table: "messages"
-    }, async ()=>{
-      await loadMessages();
-    })
-    .subscribe();
-}
-
-function startTasksRealtime(){
-  taskChannel = sb
-    .channel("tasks-live-v92")
-    .on("postgres_changes", {
-      event: "*",
-      schema: "public",
-      table: "tasks"
-    }, async ()=>{
-      await loadTasks();
-    })
-    .subscribe();
-}
-
+/* ===== ОТПРАВКА ===== */
 async function sendMessage(){
-  if(!currentUser || !currentUser.canChat) return;
-
-  const input = $("msgInput");
   const text = input.value.trim();
   if(!text) return;
-  if(!sb){
-    showError("Нет подключения к базе.");
-    return;
-  }
+
+  sendBtn.disabled = true;
 
   try{
-    const { error } = await sb.from("messages").insert({
-      user: currentUser.label,
-      text
-    });
-
-    if(error) throw error;
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/messages`,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Prefer":"return=minimal"
+        },
+        body: JSON.stringify({
+          user: currentUser,
+          text
+        })
+      }
+    );
 
     input.value = "";
-  }catch(err){
-    showError("Не удалось отправить сообщение: " + (err.message || err));
+    loadMessages(); // сразу подтянуть
+  }catch(e){
+    alert("Ошибка отправки");
+  }
+
+  sendBtn.disabled = false;
+}
+
+sendBtn.onclick = sendMessage;
+input.addEventListener("keypress", e=>{
+  if(e.key==="Enter") sendMessage();
+});
+
+/* ===== РЕНДЕР ===== */
+function renderMessage(m){
+  const row = document.createElement("div");
+  row.className = "msg-row " + (m.user === currentUser ? "mine" : "other");
+
+  const msg = document.createElement("div");
+  msg.className = "msg";
+
+  /* роли */
+  if(m.user==="Анна") msg.classList.add("user-anna");
+  if(m.user==="Наталия") msg.classList.add("user-natalia");
+  if(m.user==="Алексей") msg.classList.add("user-alexey");
+  if(m.user==="Михаил") msg.classList.add("user-mikhail");
+
+  /* контент */
+  msg.innerHTML = `
+    <div class="name">${m.user}</div>
+    <div>${m.text}</div>
+    <div class="time">${formatTime(m.created_at)}</div>
+  `;
+
+  /* эффекты */
+  if(m.user==="Анна"){
+    const fx = document.createElement("div");
+    fx.className = "fx-cloudline";
+    fx.innerHTML = `
+      <div class="cloud c1"><i></i></div>
+      <div class="cloud c2"><i></i></div>
+      <div class="cloud c3"><i></i></div>
+      <div class="cloud c4"><i></i></div>
+    `;
+    msg.appendChild(fx);
+  }
+
+  if(m.user==="Наталия"){
+    const fx = document.createElement("div");
+    fx.className = "fx-bubbleline";
+    fx.innerHTML = `
+      <span class="b1"></span>
+      <span class="b2"></span>
+      <span class="b3"></span>
+      <span class="b4"></span>
+      <span class="b5"></span>
+    `;
+    msg.appendChild(fx);
+  }
+
+  if(m.user==="Алексей"){
+    const fx = document.createElement("div");
+    fx.className = "fx-electric";
+    fx.innerHTML = `
+      <div class="inner-glow"></div>
+      <div class="flash"></div>
+      <div class="arc a1"></div>
+      <div class="arc a2"></div>
+      <div class="arc a3"></div>
+      <div class="bolt"></div>
+      <div class="pulse"></div>
+    `;
+    msg.appendChild(fx);
+  }
+
+  row.appendChild(msg);
+  chat.appendChild(row);
+}
+
+function formatTime(t){
+  if(!t) return "";
+  const d = new Date(t);
+  return d.toLocaleTimeString().slice(0,5);
+}
+
+/* первый запуск */
+loadMessages();
+
+/* ===== UI ===== */
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick = ()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+
+    document.getElementById("chatTab").style.display =
+      tab.dataset.tab==="chat" ? "block":"none";
+
+    document.getElementById("tasksTab").style.display =
+      tab.dataset.tab==="tasks" ? "block":"none";
+  };
+});
+/* ===== TASKS (минимально, чтобы не ломать визуал) ===== */
+async function loadTasks(){
+  try{
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/tasks?select=*&order=id.desc`,
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
+
+    const data = await res.json();
+    const list = document.getElementById("tasksList");
+    list.innerHTML = "";
+
+    if(!Array.isArray(data) || !data.length){
+      list.innerHTML = `<div class="task-meta">Задач пока нет</div>`;
+      return;
+    }
+
+    data.forEach(task=>{
+      const row = document.createElement("div");
+      row.className = "task-row";
+
+      const left = document.createElement("div");
+      left.innerHTML = `
+        <div class="task-title">${escapeHtml(task.title || "Без названия")}</div>
+        <div class="task-meta">
+          ${escapeHtml(task.author || "")}
+          ${task.assignee ? " → " + escapeHtml(task.assignee) : ""}
+          ${task.status ? " • " + escapeHtml(task.status) : ""}
+        </div>
+      `;
+
+      row.appendChild(left);
+      list.appendChild(row);
+    });
+  }catch(e){
+    document.getElementById("tasksList").innerHTML =
+      `<div class="task-meta">Ошибка загрузки задач</div>`;
   }
 }
 
-async function createTask(){
-  if(!sb || !currentUser) return;
-
-  const title = $("taskTitle").value.trim();
-  const description = $("taskDesc").value.trim();
-  const assignee = $("taskAssignee").value;
-
-  if(!title){
-    showError("Введите заголовок задачи.");
-    return;
-  }
+async function addTask(){
+  const titleEl = document.getElementById("taskTitle");
+  const title = titleEl.value.trim();
+  if(!title) return;
 
   try{
-    const { error } = await sb.from("tasks").insert({
-      title,
-      description,
-      assignee,
-      author: currentUser.label,
-      status: "new"
-    });
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/tasks`,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Prefer":"return=minimal"
+        },
+        body: JSON.stringify({
+          title,
+          author: currentUser,
+          assignee: currentUser,
+          status: "new"
+        })
+      }
+    );
 
-    if(error) throw error;
-
-    $("taskTitle").value = "";
-    $("taskDesc").value = "";
-  }catch(err){
-    showError("Не удалось создать задачу: " + (err.message || err));
+    titleEl.value = "";
+    loadTasks();
+  }catch(e){
+    alert("Ошибка создания задачи");
   }
 }
 
+document.getElementById("addTaskBtn").onclick = addTask;
+
+/* ===== ПОЛЬЗОВАТЕЛИ / КНОПКИ ===== */
+function setUser(name){
+  currentUser = name;
+  document.getElementById("currentUser").textContent = name;
+
+  document.body.classList.remove(
+    "role-admin-anna",
+    "role-admin-natalia",
+    "role-manager",
+    "role-chief",
+    "role-doctor"
+  );
+
+  if(name === "Анна") document.body.classList.add("role-admin-anna");
+  else if(name === "Наталия") document.body.classList.add("role-admin-natalia");
+  else if(name === "Алексей") document.body.classList.add("role-manager");
+  else if(name === "Михаил") document.body.classList.add("role-chief");
+  else document.body.classList.add("role-doctor");
+
+  loadMessages();
+  loadTasks();
+}
+
+document.getElementById("reconnectBtn").onclick = ()=>{
+  loadMessages();
+  loadTasks();
+};
+
+document.getElementById("settingsBtn").onclick = ()=>{
+  alert("В этой сборке URL и KEY зашиты прямо в код.");
+};
+
+document.getElementById("logoutBtn").onclick = ()=>{
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login").style.display = "flex";
+};
+
+document.querySelectorAll("#login button").forEach(btn=>{
+  if(btn.textContent === "Анна") btn.onclick = ()=>enterApp("Анна");
+  if(btn.textContent === "Наталия") btn.onclick = ()=>enterApp("Наталия");
+  if(btn.textContent === "Алексей") btn.onclick = ()=>enterApp("Алексей");
+  if(btn.textContent === "Михаил") btn.onclick = ()=>enterApp("Михаил");
+  if(btn.textContent === "Дарья") btn.onclick = ()=>enterApp("Дарья");
+  if(btn.textContent === "Дмитрий") btn.onclick = ()=>enterApp("Дмитрий");
+});
+
+function enterApp(name){
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  setUser(name);
+
+  if(name === "Михаил" || name === "Дарья" || name === "Дмитрий"){
+    document.querySelector('[data-tab="chat"]').style.display = "none";
+    document.getElementById("chatTab").style.display = "none";
+    document.getElementById("tasksTab").style.display = "block";
+    document.querySelector('[data-tab="tasks"]').classList.add("active");
+  }else{
+    document.querySelector('[data-tab="chat"]').style.display = "block";
+    document.getElementById("chatTab").style.display = "block";
+    document.getElementById("tasksTab").style.display = "none";
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.querySelector('[data-tab="chat"]').classList.add("active");
+  }
+}
+
+/* ===== УТИЛИТА ===== */
 function escapeHtml(str){
   return String(str)
     .replaceAll("&", "&amp;")
@@ -1503,25 +1292,6 @@ function escapeHtml(str){
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-
-document.addEventListener("keydown", (e)=>{
-  if(e.key === "Escape"){
-    closeSettings();
-    closeError();
-  }
-});
-
-$("msgInput").addEventListener("keydown", (e)=>{
-  if(e.key === "Enter"){
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-document.addEventListener("click", (e)=>{
-  if(e.target.id === "settingsModal") closeSettings();
-  if(e.target.id === "errorModal") closeError();
-});
 </script>
 </body>
 </html>
