@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Система клиники v8</title>
+<title>Система клиники v9.1</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -23,16 +23,25 @@
   --anna-1:#fff4f8;
   --anna-2:#ffe5f0;
   --anna-3:#f2a9c2;
+  --anna-cloud:#ffd8e8;
+  --anna-cloud-2:#ffe9f2;
+  --anna-cloud-shadow:rgba(242,169,194,.26);
 
   --natalia-1:#f3f8ff;
   --natalia-2:#e1eeff;
   --natalia-3:#95b9eb;
+  --natalia-bubble:#eef7ff;
+  --natalia-bubble-line:rgba(149,185,235,.40);
+  --natalia-bubble-shadow:rgba(149,185,235,.20);
 
   --alexey-1:#111318;
   --alexey-2:#171b22;
   --alexey-3:#2a3240;
   --alexey-4:#c7d2e3;
   --alexey-accent:#7fb2ff;
+  --alexey-accent-soft:rgba(127,178,255,.12);
+  --alexey-accent-mid:rgba(127,178,255,.24);
+  --alexey-accent-strong:rgba(127,178,255,.42);
 
   --doctor-1:#f6f8fa;
   --doctor-2:#e8edf2;
@@ -339,7 +348,7 @@ body.role-manager .chat-wrap{
 .msg-row{
   display:flex;
   margin:10px 0;
-  animation:msgIn .22s ease;
+  animation:msgIn .24s ease;
 }
 .msg-row.mine{justify-content:flex-end}
 .msg-row.other{justify-content:flex-start}
@@ -351,17 +360,20 @@ body.role-manager .chat-wrap{
 
 .msg{
   max-width:min(78%,720px);
-  padding:10px 12px;
-  border-radius:18px;
+  min-width:92px;
+  padding:12px 14px;
+  border-radius:22px;
   line-height:1.38;
   word-break:break-word;
-  box-shadow:0 4px 14px rgba(0,0,0,.05);
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
   position:relative;
   transition:transform .16s ease, box-shadow .16s ease;
+  overflow:visible;
+  isolation:isolate;
 }
 .msg:hover{
   transform:translateY(-1px);
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  box-shadow:0 10px 24px rgba(0,0,0,.10);
 }
 .msg.sending{opacity:.72}
 .msg-head{
@@ -378,199 +390,268 @@ body.role-manager .chat-wrap{
   opacity:.75;
   text-align:right;
 }
-.msg.mine{
-  color:#fff;
-  border-top-right-radius:6px;
-}
-
-.msg.mine.user-anna{
-  background:linear-gradient(180deg, #ffe9f2, #ffd8e8);
-  color:#5c3b4b;
-  border:1px solid rgba(242,169,194,.35);
-  box-shadow:0 6px 18px rgba(242,169,194,.20);
-  border-radius:18px 18px 8px 18px;
-}
-.msg.mine.user-anna::after{
-  content:"";
-  position:absolute;
-  right:-6px;
-  bottom:10px;
-  width:14px;
-  height:14px;
-  background:#ffd8e8;
-  border-bottom-left-radius:12px;
-  transform:rotate(-36deg);
-}
-
-.msg.mine.user-natalia{
-  background:linear-gradient(180deg, #edf5ff, #dcecff);
-  color:#35506e;
-  border:1px solid rgba(149,185,235,.35);
-  box-shadow:0 6px 18px rgba(149,185,235,.20);
-  border-radius:18px 18px 18px 8px;
-}
-.msg.mine.user-natalia::after{
-  content:"";
-  position:absolute;
-  right:-6px;
-  top:12px;
-  width:10px;
-  height:28px;
-  border-radius:12px;
-  background:linear-gradient(180deg, #edf5ff, #dcecff);
-}
-
-.msg.mine.user-mikhail{
-  background:linear-gradient(180deg, #f3edff, #e8ddff);
-  color:#493e69;
-  border:1px solid rgba(179,164,239,.30);
-  box-shadow:0 6px 18px rgba(179,164,239,.16);
-}
-
-.msg.mine.user-doctor{
-  background:linear-gradient(180deg, #f8fbfd, #e8edf2);
-  color:#30404e;
-  border:1px solid rgba(174,189,202,.28);
-  box-shadow:0 6px 18px rgba(174,189,202,.12);
-}
-
 .msg.user-alexey{
-  background:linear-gradient(180deg, #1c2430, #121821);
+  background:
+    linear-gradient(180deg, rgba(28,36,48,.98), rgba(16,22,31,.98));
   color:#eef4ff;
-  border:1px solid rgba(127,178,255,.35);
-
+  border:1px solid rgba(127,178,255,.26);
   box-shadow:
-    0 10px 28px rgba(0,0,0,.35),
-    inset 0 0 18px rgba(127,178,255,.12),
-    0 0 14px rgba(127,178,255,.25),
-    0 0 28px rgba(127,178,255,.12);
-
-  text-shadow:
-    0 0 6px rgba(127,178,255,.35),
-    0 0 12px rgba(127,178,255,.25);
-
-  animation:alexeyGlow 3s ease-in-out infinite;
+    0 10px 24px rgba(0,0,0,.30),
+    inset 0 0 18px rgba(127,178,255,.07),
+    0 0 12px rgba(127,178,255,.10);
+  text-shadow:0 0 8px rgba(127,178,255,.18);
 }
+.msg.mine.user-alexey{border-radius:22px 22px 10px 22px}
+.msg.other.user-alexey{border-radius:22px 22px 22px 10px}
 
-.msg.mine.user-alexey{
-  border-radius:18px 18px 8px 18px;
-}
-
-.msg.other.user-alexey{
-  border-radius:18px 18px 18px 8px;
-}
-@keyframes alexeyGlow{
-  0%{
-    box-shadow:
-      0 10px 28px rgba(0,0,0,.35),
-      inset 0 0 14px rgba(127,178,255,.10),
-      0 0 10px rgba(127,178,255,.18);
-  }
-  50%{
-    box-shadow:
-      0 12px 34px rgba(0,0,0,.45),
-      inset 0 0 20px rgba(127,178,255,.18),
-      0 0 20px rgba(127,178,255,.35),
-      0 0 40px rgba(127,178,255,.18);
-  }
-  100%{
-    box-shadow:
-      0 10px 28px rgba(0,0,0,.35),
-      inset 0 0 14px rgba(127,178,255,.10),
-      0 0 10px rgba(127,178,255,.18);
-  }
-}
-.msg.user-anna{
-  background:linear-gradient(180deg, #ffe9f2, #ffd8e8);
-  color:#5c3b4b;
-
-  border-radius:26px;
-  padding:12px 14px;
-
-  box-shadow:
-    0 6px 18px rgba(242,169,194,.25);
-
-  position:relative;
-}
-
-.msg.user-anna::before,
-.msg.user-anna::after{
-  content:"";
+.msg.user-alexey .fx-electric{
   position:absolute;
-  background:#ffd8e8;
-  border-radius:50%;
-}
-
-.msg.user-anna::before{
-  width:14px;
-  height:14px;
-  left:-6px;
-  bottom:10px;
-}
-
-.msg.user-anna::after{
-  width:8px;
-  height:8px;
-  left:-12px;
-  bottom:6px;
-}
-.msg.user-natalia{
-  background:linear-gradient(180deg, #edf5ff, #dcecff);
-  color:#35506e;
-  border:1px solid rgba(149,185,235,.35);
-  box-shadow:0 6px 18px rgba(149,185,235,.22);
-  position:relative;
+  inset:0;
+  pointer-events:none;
   overflow:visible;
 }
-
-.msg.mine.user-natalia{
-  border-radius:18px 18px 8px 18px;
-}
-
-.msg.other.user-natalia{
-  border-radius:18px 18px 18px 8px;
-}
-
-.msg.user-natalia::before,
-.msg.user-natalia::after{
-  content:"";
+.msg.user-alexey .fx-electric .rail{
   position:absolute;
-  border-radius:50%;
-  background:rgba(255,255,255,.58);
-  border:1px solid rgba(255,255,255,.45);
-  animation:bubbleFloat 4s infinite ease-in-out;
-  box-shadow:0 2px 8px rgba(255,255,255,.18);
-}
-
-.msg.user-natalia::before{
-  width:12px;
-  height:12px;
-  right:-6px;
-  top:10px;
-}
-
-.msg.user-natalia::after{
-  width:8px;
-  height:8px;
+  left:10px;
   right:10px;
-  top:-4px;
-  animation-delay:1.2s;
+  top:-2px;
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(127,178,255,.16), transparent);
+  opacity:.55;
 }
-@keyframes bubbleFloat{
-  0%{transform:translateY(0); opacity:.6}
-  50%{transform:translateY(-6px); opacity:1}
-  100%{transform:translateY(0); opacity:.6}
+.msg.user-alexey .fx-electric .arc{
+  position:absolute;
+  top:-3px;
+  width:22px;
+  height:8px;
+  border-top:2px solid rgba(127,178,255,.9);
+  border-radius:12px 12px 0 0;
+  filter:drop-shadow(0 0 6px rgba(127,178,255,.55));
+  opacity:0;
 }
+.msg.user-alexey .fx-electric .arc.a1{
+  left:8%;
+  animation:alexeyArc1 5.8s infinite ease-in-out;
+}
+.msg.user-alexey .fx-electric .arc.a2{
+  left:44%;
+  width:28px;
+  animation:alexeyArc2 6.6s 1.6s infinite ease-in-out;
+}
+.msg.user-alexey .fx-electric .arc.a3{
+  left:74%;
+  width:18px;
+  animation:alexeyArc3 5.2s 3.1s infinite ease-in-out;
+}
+.msg.user-alexey .fx-electric .flash{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:
+    linear-gradient(110deg,
+      transparent 0 34%,
+      rgba(127,178,255,.00) 40%,
+      rgba(127,178,255,.18) 48%,
+      rgba(255,255,255,.18) 50%,
+      rgba(127,178,255,.10) 54%,
+      transparent 62% 100%);
+  opacity:0;
+  mix-blend-mode:screen;
+  animation:alexeyFlash 6.8s infinite ease-in-out;
+}
+
+@keyframes alexeyArc1{
+  0%,100%{opacity:0;transform:translateX(-8px) scaleX(.7)}
+  10%{opacity:0}
+  16%{opacity:.95;transform:translateX(8px) scaleX(1)}
+  22%{opacity:.18;transform:translateX(16px) scaleX(.9)}
+  30%{opacity:0}
+}
+@keyframes alexeyArc2{
+  0%,100%{opacity:0;transform:translateX(-6px) scaleX(.8)}
+  20%{opacity:0}
+  27%{opacity:.88;transform:translateX(10px) scaleX(1.05)}
+  33%{opacity:.14;transform:translateX(20px) scaleX(.9)}
+  40%{opacity:0}
+}
+@keyframes alexeyArc3{
+  0%,100%{opacity:0;transform:translateX(-5px) scaleX(.75)}
+  48%{opacity:0}
+  56%{opacity:.82;transform:translateX(7px) scaleX(1)}
+  61%{opacity:.12;transform:translateX(13px) scaleX(.88)}
+  68%{opacity:0}
+}
+@keyframes alexeyFlash{
+  0%,100%{opacity:0;transform:translateX(-12%)}
+  43%{opacity:0}
+  49%{opacity:.10}
+  52%{opacity:.22}
+  56%{opacity:.08}
+  64%{opacity:0;transform:translateX(10%)}
+}
+
+.msg.user-anna{
+  background:linear-gradient(180deg, var(--anna-1), var(--anna-2));
+  color:#5c3b4b;
+  border:1px solid rgba(242,169,194,.22);
+  box-shadow:
+    0 8px 22px rgba(242,169,194,.18),
+    0 0 0 1px rgba(255,255,255,.24) inset;
+}
+.msg.mine.user-anna{border-radius:26px 26px 12px 26px}
+.msg.other.user-anna{border-radius:26px 26px 26px 12px}
+
+.msg.user-anna .fx-cloudline{
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:-10px;
+  height:20px;
+  pointer-events:none;
+  overflow:visible;
+}
+.msg.user-anna .fx-cloudline span{
+  position:absolute;
+  bottom:0;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255,255,255,.96), var(--anna-cloud-2) 55%, var(--anna-cloud) 88%);
+  box-shadow:
+    0 0 10px var(--anna-cloud-shadow),
+    inset 0 0 6px rgba(255,255,255,.28);
+  opacity:.92;
+}
+.msg.user-anna .fx-cloudline .c1{left:2%; width:18px; height:10px; animation:annaDrift1 5.4s infinite ease-in-out;}
+.msg.user-anna .fx-cloudline .c2{left:22%; width:14px; height:8px; animation:annaDrift2 6.2s .9s infinite ease-in-out;}
+.msg.user-anna .fx-cloudline .c3{left:44%; width:20px; height:11px; animation:annaDrift3 5.8s 1.4s infinite ease-in-out;}
+.msg.user-anna .fx-cloudline .c4{left:67%; width:13px; height:8px; animation:annaDrift4 6.5s 2s infinite ease-in-out;}
+.msg.user-anna .fx-cloudline .c5{left:84%; width:16px; height:9px; animation:annaDrift5 5.9s 2.7s infinite ease-in-out;}
+
+@keyframes annaDrift1{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.18}
+  18%{opacity:.92}
+  54%{transform:translate(-4px,-3px) scale(1.02)}
+  82%{transform:translate(-10px,-14px) scale(1.18);opacity:.34}
+}
+@keyframes annaDrift2{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.16}
+  22%{opacity:.88}
+  58%{transform:translate(4px,-2px) scale(1.02)}
+  84%{transform:translate(12px,-13px) scale(1.16);opacity:.28}
+}
+@keyframes annaDrift3{
+  0%,100%{transform:translate(0,0) scale(.92);opacity:.18}
+  14%{opacity:.94}
+  50%{transform:translate(-2px,-3px) scale(1.03)}
+  78%{transform:translate(-8px,-12px) scale(1.2);opacity:.30}
+}
+@keyframes annaDrift4{
+  0%,100%{transform:translate(0,0) scale(.88);opacity:.16}
+  20%{opacity:.84}
+  60%{transform:translate(3px,-2px) scale(1.04)}
+  86%{transform:translate(10px,-12px) scale(1.18);opacity:.26}
+}
+@keyframes annaDrift5{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.15}
+  24%{opacity:.86}
+  64%{transform:translate(-3px,-2px) scale(1.02)}
+  88%{transform:translate(-9px,-12px) scale(1.16);opacity:.24}
+}
+
+.msg.user-natalia{
+  background:linear-gradient(180deg, var(--natalia-1), var(--natalia-2));
+  color:#35506e;
+  border:1px solid rgba(149,185,235,.26);
+  box-shadow:
+    0 8px 22px rgba(149,185,235,.17),
+    0 0 0 1px rgba(255,255,255,.26) inset;
+}
+.msg.mine.user-natalia{border-radius:22px 22px 12px 22px}
+.msg.other.user-natalia{border-radius:22px 22px 22px 12px}
+
+.msg.user-natalia .fx-bubbleline{
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:-10px;
+  height:22px;
+  pointer-events:none;
+  overflow:visible;
+}
+.msg.user-natalia .fx-bubbleline span{
+  position:absolute;
+  bottom:0;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), var(--natalia-bubble) 58%, rgba(255,255,255,.12));
+  border:1px solid var(--natalia-bubble-line);
+  box-shadow:
+    0 0 10px var(--natalia-bubble-shadow),
+    inset 0 0 6px rgba(255,255,255,.30);
+  opacity:.92;
+}
+.msg.user-natalia .fx-bubbleline .b1{left:4%; width:10px; height:10px; animation:nBubble1 4.6s infinite ease-in-out;}
+.msg.user-natalia .fx-bubbleline .b2{left:24%; width:7px; height:7px; animation:nBubble2 5.2s .8s infinite ease-in-out;}
+.msg.user-natalia .fx-bubbleline .b3{left:49%; width:11px; height:11px; animation:nBubble3 4.8s 1.4s infinite ease-in-out;}
+.msg.user-natalia .fx-bubbleline .b4{left:71%; width:8px; height:8px; animation:nBubble4 5.4s 2.1s infinite ease-in-out;}
+.msg.user-natalia .fx-bubbleline .b5{left:88%; width:9px; height:9px; animation:nBubble5 4.9s 2.8s infinite ease-in-out;}
+@keyframes nBubble1{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.18}
+  18%{opacity:.95}
+  52%{transform:translate(2px,-6px) scale(1.05)}
+  78%{transform:translate(4px,-18px) scale(1.18);opacity:.28}
+  90%{transform:translate(5px,-22px) scale(.2);opacity:0}
+}
+@keyframes nBubble2{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.16}
+  20%{opacity:.9}
+  56%{transform:translate(-1px,-5px) scale(1.02)}
+  80%{transform:translate(-2px,-16px) scale(1.12);opacity:.26}
+  92%{transform:translate(-3px,-20px) scale(.2);opacity:0}
+}
+@keyframes nBubble3{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.18}
+  16%{opacity:.96}
+  50%{transform:translate(3px,-6px) scale(1.05)}
+  76%{transform:translate(6px,-18px) scale(1.2);opacity:.30}
+  90%{transform:translate(7px,-22px) scale(.2);opacity:0}
+}
+@keyframes nBubble4{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.16}
+  22%{opacity:.88}
+  60%{transform:translate(2px,-5px) scale(1.04)}
+  82%{transform:translate(4px,-17px) scale(1.16);opacity:.26}
+  94%{transform:translate(5px,-21px) scale(.2);opacity:0}
+}
+@keyframes nBubble5{
+  0%,100%{transform:translate(0,0) scale(.9);opacity:.15}
+  24%{opacity:.9}
+  62%{transform:translate(-2px,-5px) scale(1.04)}
+  84%{transform:translate(-4px,-16px) scale(1.14);opacity:.24}
+  96%{transform:translate(-5px,-20px) scale(.2);opacity:0}
+}
+
+/* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
+
 .msg.user-mikhail{
   background:linear-gradient(180deg, var(--mikhail-1), var(--mikhail-2));
   color:#493e69;
-  border:1px solid rgba(179,164,239,.2);
+  border:1px solid rgba(179,164,239,.20);
 }
+.msg.mine.user-mikhail{border-radius:22px 22px 12px 22px}
+.msg.other.user-mikhail{border-radius:22px 22px 22px 12px}
+
 .msg.user-doctor{
   background:linear-gradient(180deg, #fbfdff, var(--doctor-2));
   color:#30404e;
   border:1px solid rgba(174,189,202,.22);
 }
+.msg.mine.user-doctor{border-radius:22px 22px 12px 22px}
+.msg.other.user-doctor{border-radius:22px 22px 22px 12px}
+
+/* INPUT */
+
 .input-wrap{
   display:flex;
   gap:8px;
@@ -583,11 +664,6 @@ body.role-manager .chat-wrap{
   border-radius:14px;
   font-size:14px;
   outline:none;
-  transition:border .15s ease, box-shadow .15s ease;
-}
-.input-wrap input:focus{
-  border-color:#888;
-  box-shadow:0 0 0 3px rgba(0,0,0,.05);
 }
 .send-btn{
   padding:0 18px;
@@ -596,143 +672,24 @@ body.role-manager .chat-wrap{
   background:#111;
   color:#fff;
   cursor:pointer;
-  min-width:116px;
-  transition:transform .16s ease, box-shadow .16s ease, opacity .16s ease;
-}
-.send-btn:hover{transform:translateY(-1px)}
-.send-btn:disabled{opacity:.6;cursor:default}
-
-.status-line{
-  margin-top:8px;
-  min-height:18px;
-  font-size:12px;
-  color:var(--muted);
 }
 
-/* ЗАДАЧИ */
+/* TASKS */
+
 .tasks-layout{
   display:grid;
-  grid-template-columns:1fr;
   gap:10px;
 }
-.task-form{
-  background:rgba(255,255,255,.78);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:14px;
-  backdrop-filter:blur(10px);
-  box-shadow:var(--panel-shadow);
-}
-body.role-manager .task-form{
-  background:rgba(21,25,35,.9);
-  border-color:#242b38;
-}
-.task-form h3,
-.tasks-list h3{
-  margin:0 0 10px;
-  font-size:18px;
-}
-
-.form-row{margin-bottom:10px}
-.form-row label{
-  display:block;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:700;
-}
-.form-row input,
-.form-row textarea,
-.form-row select{
-  width:100%;
-  padding:12px 13px;
-  border:1px solid #ccc;
-  border-radius:12px;
-  font-size:14px;
-  outline:none;
-}
-.form-row textarea{
-  min-height:90px;
-  resize:vertical;
-}
-
-.tasks-list{
-  background:rgba(255,255,255,.78);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:14px;
-  backdrop-filter:blur(10px);
-  box-shadow:var(--panel-shadow);
-}
-body.role-manager .tasks-list{
-  background:rgba(21,25,35,.9);
-  border-color:#242b38;
-}
-
 .task-card{
   border:1px solid var(--line);
   border-radius:16px;
   padding:12px;
   margin-bottom:10px;
   background:rgba(255,255,255,.7);
-  transition:transform .16s ease, box-shadow .16s ease;
-}
-.task-card:hover{
-  transform:translateY(-1px);
-  box-shadow:0 10px 24px rgba(0,0,0,.08);
-}
-body.role-manager .task-card{
-  background:rgba(28,33,44,.9);
-  border-color:#2a3240;
-}
-
-.task-title{
-  font-size:16px;
-  font-weight:800;
-  margin-bottom:6px;
-}
-.task-desc{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.45;
-  white-space:pre-wrap;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-}
-
-.badge.author{background:#f0e7e2;color:#564b46}
-.badge.assignee{background:#e6eef9;color:#324762}
-.badge.status-new{background:var(--warn);color:var(--warn-text)}
-.badge.status-progress{background:var(--progress);color:var(--progress-text)}
-.badge.status-done{background:var(--success);color:var(--success-text)}
-
-.task-actions{
-  margin-top:10px;
-  display:flex;
-  gap:8px;
-}
-.task-btn{
-  border:none;
-  border-radius:10px;
-  padding:8px 12px;
-  cursor:pointer;
-  font-size:12px;
-  font-weight:700;
-  background:#111;
-  color:#fff;
-}
-.task-btn.light{
-  background:#e8e8e8;
-  color:#222;
 }
 
 /* SETTINGS */
+
 #settingsModal{
   position:fixed;
   inset:0;
@@ -740,7 +697,6 @@ body.role-manager .task-card{
   display:none;
   align-items:center;
   justify-content:center;
-  padding:20px;
   z-index:99999;
 }
 .settings-card{
@@ -749,69 +705,18 @@ body.role-manager .task-card{
   border-radius:18px;
   padding:20px;
 }
-.settings-card h3{margin:0 0 10px;font-size:24px}
+
+/* MOBILE */
 
 @media (max-width:800px){
   .chat-wrap{height:48vh}
   .msg{max-width:88%}
 }
-.field{margin-bottom:12px}
-.field label{
-  display:block;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:700;
-}
-.field input,
-.field textarea{
-  width:100%;
-  padding:12px 14px;
-  border:1px solid #ccc;
-  border-radius:12px;
-  font-size:14px;
-  outline:none;
-}
-.field textarea{
-  min-height:110px;
-  resize:vertical;
-}
-.settings-actions{
-  display:flex;
-  gap:8px;
-  justify-content:flex-end;
-  flex-wrap:wrap;
-}
-.settings-actions button{
-  width:auto;
-  min-width:150px;
-}
-.hint{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:6px;
-  line-height:1.45;
-}
-.role-lock-note{
-  margin-top:8px;
-  font-size:12px;
-  color:var(--muted);
-}
-
-.floaty{
-  animation:floaty 4.8s ease-in-out infinite;
-}
-@keyframes floaty{
-  0%{transform:translateY(0)}
-  50%{transform:translateY(-4px)}
-  100%{transform:translateY(0)}
-}
-
 </style>
 </head>
 <body>
-
 <div id="login">
-  <div class="card floaty">
+  <div class="card">
     <h2>Вход</h2>
     <p>Чат и задачи клиники.</p>
 
@@ -838,7 +743,7 @@ body.role-manager .task-card{
 
 <div id="app">
   <div class="top">
-    <div class="title">Система клиники v8</div>
+    <div class="title">Система клиники v9.1</div>
     <div class="top-right">
       <div class="user-name" id="userName">—</div>
       <button type="button" class="top-btn light" id="btnReconnect">Переподключить</button>
@@ -940,6 +845,7 @@ const USERS = {
 const TASK_CREATORS = new Set(["Анна", "Наталия", "Алексей", "Михаил"]);
 const TASK_ASSIGNEES = ["Анна", "Наталия", "Михаил", "Дарья", "Дмитрий", "Наталья", "Давид"];
 const TASK_STATUS_ORDER = ["new", "progress", "done"];
+
 let текущийПользователь = "";
 let текущаяРоль = "";
 let текущаяТема = "";
@@ -996,10 +902,10 @@ document.getElementById("btnSettings").onclick = открытьНастройк�
 document.getElementById("btnCloseSettings").onclick = закрытьНастройки;
 document.getElementById("btnSaveSettings").onclick = сохранитьНастройки;
 document.getElementById("btnClearSettings").onclick = очиститьНастройки;
+document.getElementById("btnReconnect").onclick = async()=>{ if(текущийПользователь) await подключение(); };
 document.getElementById("btnExit").onclick = выход;
 
 sendBtn.onclick = отправитьСообщение;
-
 msgInput.addEventListener("keydown", (e)=>{
   if(e.key==="Enter"){
     e.preventDefault();
@@ -1012,18 +918,16 @@ createTaskBtn.onclick = создатьЗадачу;
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.onclick = ()=>открытьВкладку(btn.dataset.tab);
 });
-
 function вход(name){
   текущийПользователь = name;
   текущаяРоль = USERS[name].role;
   текущаяТема = USERS[name].theme;
 
-  document.body.className = "role-" + текущаяРоль + (name==="Анна"?"-anna":name==="Наталия"?"-natalia":"");
-
+  document.body.className = "role-" + текущаяРоль + (name==="Анна" ? "-anna" : name==="Наталия" ? "-natalia" : "");
   document.getElementById("userName").textContent = name;
 
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").style.display="block";
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
 
   обновитьДоступЧата();
   заполнитьСписокОтветственных();
@@ -1058,68 +962,33 @@ function обновитьДоступЧата(){
     messagesEl.innerHTML = "";
   }
 }
+
 function открытьВкладку(tab){
   const canChat = USERS[текущийПользователь]?.canChat;
   if(tab === "chat" && !canChat) return;
 
   document.querySelectorAll(".tab-btn").forEach(b=>{
-    b.classList.toggle("active", b.dataset.tab===tab);
+    b.classList.toggle("active", b.dataset.tab === tab);
   });
 
-  document.getElementById("chatSection").classList.toggle("active", tab==="chat");
-  document.getElementById("tasksSection").classList.toggle("active", tab==="tasks");
+  document.getElementById("chatSection").classList.toggle("active", tab === "chat");
+  document.getElementById("tasksSection").classList.toggle("active", tab === "tasks");
 }
+
 function заполнитьСписокОтветственных(){
-  taskAssigneeSelect.innerHTML="";
+  taskAssigneeSelect.innerHTML = "";
   TASK_ASSIGNEES.forEach(n=>{
-    const o=document.createElement("option");
-    o.value=n;
-    o.textContent=n;
+    const o = document.createElement("option");
+    o.value = n;
+    o.textContent = n;
     taskAssigneeSelect.appendChild(o);
   });
 }
 
 function настроитьФормуЗадач(){
-  taskFormBlock.style.display = TASK_CREATORS.has(текущийПользователь) ? "block":"none";
+  taskFormBlock.style.display = TASK_CREATORS.has(текущийПользователь) ? "block" : "none";
 }
-async function подключение(){
-  try{
-    await остановитьВсеПодписки();
-    закрытьНастройки();
 
-    statusText.textContent = "Подключение...";
-    tasksStatus.textContent = "Подключение...";
-
-    клиент = создатьКлиент();
-
-    сброситьЧат();
-    сброситьЗадачи();
-
-    const canChat = USERS[текущийПользователь]?.canChat;
-
-    if(canChat){
-      await загрузитьСообщения();
-      включитьChatRealtime();
-      запуститьChatPolling();
-      statusText.textContent = "Подключено";
-    }else{
-      messagesEl.innerHTML = "";
-      statusText.textContent = "Чат отключен";
-    }
-
-    await загрузитьЗадачи();
-    включитьTasksRealtime();
-    запуститьTasksPolling();
-
-    подключено = true;
-    tasksStatus.textContent = "Задачи подключены";
-  }catch(err){
-    console.error(err);
-    statusText.textContent = "Ошибка подключения";
-    tasksStatus.textContent = "Ошибка подключения";
-    alert("Ошибка подключения:\n\n" + err.message);
-  }
-}
 function показатьОшибку(text){
   loginError.style.display = "block";
   loginError.textContent = text;
@@ -1143,10 +1012,9 @@ function открытьНастройки(){
   document.getElementById("settingsModal").style.display = "flex";
 }
 function закрытьНастройки(){
-  const modal = document.getElementById("settingsModal");
-  modal.style.display = "none";
-  modal.classList.remove("active");
+  document.getElementById("settingsModal").style.display = "none";
 }
+
 async function сохранитьНастройки(){
   const url = projectUrlInput.value.trim();
   const key = anonKeyInput.value.trim();
@@ -1166,6 +1034,7 @@ async function сохранитьНастройки(){
     alert("Данные сохранены. Теперь нажми нужного пользователя.");
   }
 }
+
 function очиститьНастройки(){
   localStorage.removeItem("clinic_supabase_url");
   localStorage.removeItem("clinic_supabase_key");
@@ -1217,6 +1086,45 @@ function сброситьЗадачи(){
   tasksExistingIds.clear();
   tasksLastId = 0;
   tasksList.innerHTML = "";
+}
+
+async function подключение(){
+  try{
+    await остановитьВсеПодписки();
+    закрытьНастройки();
+
+    statusText.textContent = "Подключение...";
+    tasksStatus.textContent = "Подключение...";
+
+    клиент = создатьКлиент();
+
+    сброситьЧат();
+    сброситьЗадачи();
+
+    const canChat = USERS[текущийПользователь]?.canChat;
+
+    if(canChat){
+      await загрузитьСообщения();
+      включитьChatRealtime();
+      запуститьChatPolling();
+      statusText.textContent = "Подключено";
+    }else{
+      messagesEl.innerHTML = "";
+      statusText.textContent = "Чат отключен";
+    }
+
+    await загрузитьЗадачи();
+    включитьTasksRealtime();
+    запуститьTasksPolling();
+
+    подключено = true;
+    tasksStatus.textContent = "Задачи подключены";
+  }catch(err){
+    console.error(err);
+    statusText.textContent = "Ошибка подключения";
+    tasksStatus.textContent = "Ошибка подключения";
+    alert("Ошибка подключения:\n\n" + err.message);
+  }
 }
 
 async function загрузитьСообщения(){
@@ -1273,6 +1181,50 @@ function получитьКлассСообщения(user){
   if(["Дарья","Дмитрий","Наталья","Давид"].includes(user)) return "user-doctor";
   return "";
 }
+
+function создатьЭффектыСообщения(user){
+  if(user === "Анна"){
+    const fx = document.createElement("div");
+    fx.className = "fx-cloudline";
+    fx.innerHTML = `
+      <span class="c1"></span>
+      <span class="c2"></span>
+      <span class="c3"></span>
+      <span class="c4"></span>
+      <span class="c5"></span>
+    `;
+    return fx;
+  }
+
+  if(user === "Наталия"){
+    const fx = document.createElement("div");
+    fx.className = "fx-bubbleline";
+    fx.innerHTML = `
+      <span class="b1"></span>
+      <span class="b2"></span>
+      <span class="b3"></span>
+      <span class="b4"></span>
+      <span class="b5"></span>
+    `;
+    return fx;
+  }
+
+  if(user === "Алексей"){
+    const fx = document.createElement("div");
+    fx.className = "fx-electric";
+    fx.innerHTML = `
+      <span class="rail"></span>
+      <span class="arc a1"></span>
+      <span class="arc a2"></span>
+      <span class="arc a3"></span>
+      <span class="flash"></span>
+    `;
+    return fx;
+  }
+
+  return null;
+}
+
 function добавитьСообщениеНаЭкран(row, temporary){
   const mine = row.user === текущийПользователь;
 
@@ -1288,13 +1240,10 @@ function добавитьСообщениеНаЭкран(row, temporary){
   const bubble = document.createElement("div");
   bubble.className = "msg " + (mine ? "mine " : "other ") + получитьКлассСообщения(row.user);
 
-  if(!получитьКлассСообщения(row.user)){
-    if(mine){
-      bubble.classList.add("user-alexey");
-    }
-  }
-
   if(temporary) bubble.classList.add("sending");
+
+  const fx = создатьЭффектыСообщения(row.user);
+  if(fx) bubble.appendChild(fx);
 
   const head = document.createElement("div");
   head.className = "msg-head";
@@ -1314,6 +1263,7 @@ function добавитьСообщениеНаЭкран(row, temporary){
   line.appendChild(bubble);
   messagesEl.appendChild(line);
 }
+
 function удалитьВременныеДубли(realRow){
   const tempLines = messagesEl.querySelectorAll('[data-temp="1"]');
   tempLines.forEach(line=>{
@@ -1336,7 +1286,7 @@ function прокрутитьВниз(){
 
 function включитьChatRealtime(){
   chatChannel = клиент
-    .channel("messages-live-room-v8")
+    .channel("messages-live-room-v91")
     .on("postgres_changes", {
       event:"INSERT",
       schema:"public",
@@ -1356,7 +1306,7 @@ function включитьChatRealtime(){
 
 function включитьTasksRealtime(){
   tasksChannel = клиент
-    .channel("tasks-live-room-v8")
+    .channel("tasks-live-room-v91")
     .on("postgres_changes", {
       event:"INSERT",
       schema:"public",
@@ -1490,6 +1440,7 @@ function статусТекст(status){
   if(status==="done") return "Завершена";
   return status || "";
 }
+
 function следующийСтатус(status){
   const idx = TASK_STATUS_ORDER.indexOf(status || "new");
   return TASK_STATUS_ORDER[(idx + 1) % TASK_STATUS_ORDER.length];
