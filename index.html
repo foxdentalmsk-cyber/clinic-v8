@@ -710,13 +710,15 @@ body.role-manager .chat-wrap::-webkit-scrollbar-thumb{
 
 #fxLayer{
   position:absolute;
-  inset:12px;
+  top:12px;
+  left:12px;
+  right:12px;
+  bottom:86px;
   overflow:hidden;
   pointer-events:none;
   z-index:4;
   border-radius:24px;
 }
-
 .chat-empty{
   min-height:100%;
   display:flex;
@@ -740,12 +742,11 @@ body.role-manager .chat-wrap::-webkit-scrollbar-thumb{
 
 .msg-row{
   display:flex;
-  margin:12px 0;
+  margin:22px 0;
   position:relative;
   z-index:5;
   animation:msgIn .22s ease;
 }
-
 .msg-row.mine{
   justify-content:flex-end;
 }
@@ -1231,10 +1232,15 @@ body.role-manager .chat-wrap::-webkit-scrollbar-thumb{
   border-radius:16px;
   border:1px solid var(--input-line);
   background:var(--input);
+  color:var(--text);
   padding:12px 14px;
   outline:none;
 }
 
+.input-wrap input::placeholder{
+  color:var(--muted);
+  opacity:.9;
+}
 .send-btn{
   min-height:48px;
   border:none;
@@ -1440,8 +1446,8 @@ body.role-manager .chat-wrap::-webkit-scrollbar-thumb{
 </div>
 
 <script>
-const SUPABASE_URL = "https://dbhedecxabglqidtdglw.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qWswXBaePAA0IQCK8nCylg_rh-bhhaF";
+const SUPABASE_URL = "https://yzaqdjgkvobfxldnxbqb.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_CeDgerz3xYSnDDCMbVq8Zg_Z6flaBNc";
 
 const USERS = {
   anna: {
@@ -1861,14 +1867,13 @@ function getParticleAnchor(rowEl, msgEl, offsetY = 34){
   const mine = rowEl.classList.contains("mine");
 
   const x = mine
-    ? box.left - wrapRect.left + wrap.scrollLeft + 18
-    : box.right - wrapRect.left + wrap.scrollLeft - 18;
+    ? box.left - wrapRect.left + wrap.scrollLeft - 10
+    : box.right - wrapRect.left + wrap.scrollLeft + 10;
 
-  const y = box.top - wrapRect.top + wrap.scrollTop + Math.min(offsetY, Math.max(18, box.height * 0.55));
+  const y = box.top - wrapRect.top + wrap.scrollTop + Math.min(offsetY, Math.max(18, box.height * 0.48));
 
   return { x, y, mine };
 }
-
 function spawnCloudPuff(rowEl, msgEl){
   if(!document.body.contains(msgEl)) return;
 
