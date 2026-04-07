@@ -1835,7 +1835,8 @@ async function initDataAndRealtime(){
     }
     scheduleReconnect("init");
   }
-}function renderNoChatState(){
+}
+function renderNoChatState(){
   $("chatWrap").innerHTML = `<div class="chat-empty">Для этой роли чат сейчас отключен.</div>`;
   $("fxLayer").innerHTML = "";
 }
@@ -1866,18 +1867,26 @@ function getParticleAnchor(rowEl, msgEl, offsetY = 34){
   const box = msgEl.getBoundingClientRect();
   const mine = rowEl.classList.contains("mine");
 
-  const x = mine
-    ? box.left - wrapRect.left + wrap.scrollLeft - 10
-    : box.right - wrapRect.left + wrap.scrollLeft + 10;
+  const localLeft = box.left - wrapRect.left + wrap.scrollLeft;
+  const localRight = box.right - wrapRect.left + wrap.scrollLeft;
+  const localTop = box.top - wrapRect.top + wrap.scrollTop;
 
-  const y = box.top - wrapRect.top + wrap.scrollTop + Math.min(offsetY, Math.max(18, box.height * 0.48));
+  const side = mine ? "right" : "left";
 
-  return { x, y, mine };
+  const x = side === "left"
+    ? localRight - 8
+    : localLeft + 8;
+
+  const y = localTop + Math.min(offsetY, Math.max(18, box.height * 0.52));
+
+  return { x, y, mine, side, boxWidth: box.width, boxHeight: box.height };
 }
+
 function spawnCloudPuff(rowEl, msgEl){
   if(!document.body.contains(msgEl)) return;
 
-  const { x, y, mine } = getParticleAnchor(rowEl, msgEl, 34);
+  const base = getParticleAnchor(rowEl, msgEl);
+const { x, y, side, boxHeight } = base;
 
   const puff = document.createElement("div");
   puff.className = "particle cloud-puff";
@@ -1905,28 +1914,29 @@ function spawnCloudPuff(rowEl, msgEl){
 
   $("fxLayer").appendChild(puff);
 
-  const dx = (mine ? -1 : 1) * (90 + Math.random() * 80);
-  const dy = -(12 + Math.random() * 38);
-  const rot = Math.random() * 18 - 9;
-  const duration = 1700 + Math.random() * 700;
+  const inward = side === "left" ? 56 + Math.random() * 46 : -(56 + Math.random() * 46);
+  const driftY = -(6 + Math.random() * 18);
+  const rot = Math.random() * 14 - 7;
+  const duration = 1300 + Math.random() * 500;
 
   puff.animate([
-    { transform: "translate(0px,0px) scale(.7) rotate(0deg)", opacity: 0 },
-    { transform: `translate(${dx * .28}px, ${dy * .28}px) scale(1) rotate(${rot * .3}deg)`, opacity: .96, offset: .22 },
-    { transform: `translate(${dx * .72}px, ${dy * .72}px) scale(1.12) rotate(${rot * .7}deg)`, opacity: .54, offset: .72 },
-    { transform: `translate(${dx}px, ${dy}px) scale(1.24) rotate(${rot}deg)`, opacity: 0 }
+    { transform: "translate(0px,0px) scale(.72) rotate(0deg)", opacity: 0 },
+    { transform: `translate(${inward * .25}px, ${driftY * .25}px) scale(.96) rotate(${rot * .25}deg)`, opacity: .92, offset: .22 },
+    { transform: `translate(${inward * .68}px, ${driftY * .68}px) scale(1.06) rotate(${rot * .7}deg)`, opacity: .42, offset: .72 },
+    { transform: `translate(${inward}px, ${driftY}px) scale(1.14) rotate(${rot}deg)`, opacity: 0 }
   ], {
     duration,
     easing: "cubic-bezier(.22,.61,.36,1)"
   });
 
-  setTimeout(() => puff.remove(), duration + 100);
+  setTimeout(() => puff.remove(), duration + 80);
 }
 
 function spawnBubblePuff(rowEl, msgEl){
   if(!document.body.contains(msgEl)) return;
 
-  const { x, y, mine } = getParticleAnchor(rowEl, msgEl, 36);
+  const base = getParticleAnchor(rowEl, msgEl);
+const { x, y, side, boxHeight } = base;
 
   const bubble = document.createElement("div");
   bubble.className = "particle bubble-puff";
@@ -1939,21 +1949,21 @@ function spawnBubblePuff(rowEl, msgEl){
 
   $("fxLayer").appendChild(bubble);
 
-  const dx = (mine ? -1 : 1) * (100 + Math.random() * 100);
-  const dy = -(14 + Math.random() * 58);
-  const duration = 1500 + Math.random() * 800;
+  const inward = side === "left" ? 70 + Math.random() * 54 : -(70 + Math.random() * 54);
+  const driftY = -(4 + Math.random() * 22);
+  const duration = 1200 + Math.random() * 550;
 
   bubble.animate([
-    { transform: "translate(0px,0px) scale(.68)", opacity: 0 },
-    { transform: `translate(${dx * .24}px, ${dy * .24}px) scale(1)`, opacity: .94, offset: .18 },
-    { transform: `translate(${dx * .68}px, ${dy * .68}px) scale(.92)`, opacity: .5, offset: .70 },
-    { transform: `translate(${dx}px, ${dy}px) scale(.56)`, opacity: 0 }
+    { transform: "translate(0px,0px) scale(.7)", opacity: 0 },
+    { transform: `translate(${inward * .22}px, ${driftY * .22}px) scale(1)`, opacity: .95, offset: .18 },
+    { transform: `translate(${inward * .65}px, ${driftY * .65}px) scale(.88)`, opacity: .46, offset: .70 },
+    { transform: `translate(${inward}px, ${driftY}px) scale(.58)`, opacity: 0 }
   ], {
     duration,
     easing: "cubic-bezier(.22,.61,.36,1)"
   });
 
-  setTimeout(() => bubble.remove(), duration + 100);
+  setTimeout(() => bubble.remove(), duration + 80);
 }
 
 function spawnEnergyArc(msgEl){
