@@ -2100,25 +2100,40 @@ function startLiveEffect(rowEl, msgEl, userLabel){
   }
 
   if(userLabel === "Алексей"){
-    for(let i = 0; i < 3; i++){
-      setTimeout(() => {
-        spawnEnergyArc(msgEl);
-        spawnEnergySpark(msgEl);
-      }, i * 180);
+  timerA = setInterval(() => {
+    const flash = msgEl.querySelector(".flash");
+    const bolt = msgEl.querySelector(".bolt");
+    const pulse = msgEl.querySelector(".pulse");
+
+    if(flash){
+      flash.style.animation = "none";
+      void flash.offsetWidth;
+      flash.style.animation = "alexFlash 1.8s ease-out";
     }
 
-    timerA = setInterval(() => {
-      spawnEnergyArc(msgEl);
-      if(Math.random() > .35) spawnEnergySpark(msgEl);
-      if(Math.random() > .62) setTimeout(() => spawnEnergySpark(msgEl), 90);
-    }, 840);
+    if(bolt && Math.random() > 0.45){
+      bolt.style.animation = "none";
+      void bolt.offsetWidth;
+      bolt.style.animation = "alexBolt 1.1s ease-out";
+    }
 
-    timerB = setInterval(() => {
-      if(Math.random() > .25) spawnEnergySpark(msgEl);
-    }, 430);
-  }
+    if(pulse){
+      pulse.style.animation = "none";
+      void pulse.offsetWidth;
+      pulse.style.animation = "alexPulse 1.6s ease-in-out";
+    }
+  }, 1200);
 
-  liveTimers.set(msgEl, { timerA, timerB });
+  timerB = setInterval(() => {
+    const sparks = msgEl.querySelectorAll(".spark");
+    sparks.forEach((spark, i) => {
+      if(Math.random() > 0.45){
+        spark.style.animation = "none";
+        void spark.offsetWidth;
+        spark.style.animation = `alexSpark${(i % 3) + 1} 0.9s ease-out`;
+      }
+    });
+  }, 700);
 }
 
 function renderMessages(){
