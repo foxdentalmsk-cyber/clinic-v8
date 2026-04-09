@@ -212,21 +212,6 @@ button{-webkit-tap-highlight-color:transparent}
 .stats-period-actions{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
 .stats-period-actions .top-btn{min-height:46px}
 @media (max-width:700px){.tasks-toolbar{grid-template-columns:1fr}.schedule-toolbar{grid-template-columns:1fr}.patients-layout,.patient-profile-grid,.patient-data-grid,.patients-toolbar,.stats-period-manual{grid-template-columns:1fr}.login-grid{grid-template-columns:1fr}.input-wrap{flex-direction:column}.send-btn{width:100%}.msg{max-width:92%}.topbar{align-items:flex-start}.tabs{position:sticky;top:0;z-index:6;padding-top:6px;background:linear-gradient(180deg,var(--bg) 0%,rgba(0,0,0,0) 100%)}}
-
-.pin-auth-card{max-width:420px}
-.pin-auth-title{font-size:22px;font-weight:900;margin:0}
-.pin-auth-sub{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
-.pin-auth-selected{margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.66)}
-.pin-auth-selected-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:800}
-.pin-auth-selected-value{font-size:17px;font-weight:900;margin-top:6px}
-.pin-auth-label{display:block;margin:14px 0 6px;font-size:13px;font-weight:800}
-.pin-auth-input{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--input-line);background:var(--input);color:var(--text);padding:12px 14px;outline:none;font-size:22px;font-weight:900;letter-spacing:.18em;text-align:center}
-.pin-auth-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
-.pin-auth-notice{min-height:18px;margin-top:10px;font-size:13px;line-height:1.45}
-.pin-auth-notice.error{color:#9d1f1f}
-.pin-auth-notice.success{color:#2f6f46}
-.pin-auth-notice.pending{color:var(--muted)}
-
 </style>
 </head>
 <body>
@@ -240,31 +225,31 @@ button{-webkit-tap-highlight-color:transparent}
       <div class="login-group">
         <div class="login-group-title">Администраторы</div>
         <div class="login-grid">
-          <button class="login-btn role-anna" onclick="openPinModal('anna')">Анна</button>
-          <button class="login-btn role-natalia" onclick="openPinModal('natalia')">Наталия</button>
+          <button class="login-btn role-anna" onclick="openPinLogin('anna')">Анна</button>
+          <button class="login-btn role-natalia" onclick="openPinLogin('natalia')">Наталия</button>
         </div>
       </div>
       <div class="login-group">
         <div class="login-group-title">Управление</div>
         <div class="login-grid">
-          <button class="login-btn role-alexey" onclick="openPinModal('alexey')">Алексей</button>
-          <button class="login-btn role-mikhail" onclick="openPinModal('mikhail')">Михаил</button>
+          <button class="login-btn role-alexey" onclick="openPinLogin('alexey')">Алексей</button>
+          <button class="login-btn role-mikhail" onclick="openPinLogin('mikhail')">Михаил</button>
         </div>
       </div>
       <div class="login-group">
         <div class="login-group-title">Врачи</div>
         <div class="login-grid">
-          <button class="login-btn role-doctor" onclick="openPinModal('daria')">Дарья</button>
-          <button class="login-btn role-doctor" onclick="openPinModal('dmitry')">Дмитрий</button>
-          <button class="login-btn role-doctor" onclick="openPinModal('natalya')">Наталья</button>
-          <button class="login-btn role-doctor" onclick="openPinModal('david')">Давид</button>
+          <button class="login-btn role-doctor" onclick="openPinLogin('daria')">Дарья</button>
+          <button class="login-btn role-doctor" onclick="openPinLogin('dmitry')">Дмитрий</button>
+          <button class="login-btn role-doctor" onclick="openPinLogin('natalya')">Наталья</button>
+          <button class="login-btn role-doctor" onclick="openPinLogin('david')">Давид</button>
         </div>
       </div>
       <div class="login-group">
         <div class="login-group-title">Ассистенты</div>
         <div class="login-grid">
-          <button class="login-btn role-assistant" onclick="openPinModal('assistant1')">Ассистент 1</button>
-          <button class="login-btn role-assistant" onclick="openPinModal('assistant2')">Ассистент 2</button>
+          <button class="login-btn role-assistant" onclick="openPinLogin('assistant1')">Ассистент 1</button>
+          <button class="login-btn role-assistant" onclick="openPinLogin('assistant2')">Ассистент 2</button>
         </div>
       </div>
     </div>
@@ -272,6 +257,31 @@ button{-webkit-tap-highlight-color:transparent}
       <button class="settings-open-btn" onclick="openSettings()">Настройки</button>
       <div class="login-note">Вход по PIN-коду</div>
       <div id="loginError" class="login-error"></div>
+    </div>
+  </div>
+</div>
+
+
+<div id="pinLoginModal" class="modal">
+  <div class="modal-card" style="max-width:420px">
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">Введите PIN</div>
+    <div class="small muted" style="line-height:1.45">Код проверяется только у выбранного пользователя. Чужой PIN не пропустит.</div>
+
+    <div style="margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.55)">
+      <div class="small muted" style="text-transform:uppercase;font-weight:800;letter-spacing:.05em">Выбран пользователь</div>
+      <div id="pinLoginUserLabel" style="font-size:17px;font-weight:900;margin-top:6px">—</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="label" for="pinLoginInput">PIN-код</label>
+      <input id="pinLoginInput" class="field" type="password" inputmode="numeric" maxlength="8" placeholder="••••" style="font-size:22px;font-weight:900;letter-spacing:.18em;text-align:center" />
+    </div>
+
+    <div id="pinLoginNotice" class="small muted" style="min-height:18px;margin-top:10px"></div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px">
+      <button class="top-btn secondary" type="button" onclick="closePinLogin()">Отмена</button>
+      <button id="pinLoginSubmitBtn" class="top-btn primary" type="button" onclick="submitPinLogin()">Войти</button>
     </div>
   </div>
 </div>
@@ -767,25 +777,6 @@ button{-webkit-tap-highlight-color:transparent}
       </div>
     </div>
     <iframe id="patientCardFrame" class="patient-card-frame" title="Карточка пациента"></iframe>
-  </div>
-</div>
-
-
-<div id="pinAuthModal" class="modal" onclick="handlePinAuthBackdrop(event)">
-  <div class="modal-card pin-auth-card" onclick="event.stopPropagation()">
-    <h3 class="pin-auth-title">Введите PIN</h3>
-    <p class="pin-auth-sub">Код проверяется только у выбранного пользователя. Чужой PIN не пропустит.</p>
-    <div class="pin-auth-selected">
-      <div class="pin-auth-selected-label">Выбран пользователь</div>
-      <div id="pinAuthSelectedUser" class="pin-auth-selected-value">—</div>
-    </div>
-    <label class="pin-auth-label" for="pinAuthInput">PIN-код</label>
-    <input id="pinAuthInput" class="pin-auth-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" />
-    <div id="pinAuthNotice" class="pin-auth-notice"></div>
-    <div class="pin-auth-actions">
-      <button class="top-btn secondary" type="button" onclick="closePinAuthModal()">Отмена</button>
-      <button class="top-btn primary" type="button" onclick="submitPinAuth()">Войти</button>
-    </div>
   </div>
 </div>
 
@@ -2398,7 +2389,7 @@ function updateAccessVisibility(){
   setScheduleFormVisibility();
   if(currentUser&&!currentUser.canChat){switchTab(currentUser.role==="assistant"?"schedule":"tasks")}
 }
-async function loginAsInternal(userId){
+async function loginAs(userId){
   try{
     clearLoginError(); if(!USERS[userId]) throw new Error("Неизвестный пользователь");
     currentUser=USERS[userId]; localStorage.setItem("clinic_crm_user", userId); applyTheme(currentUser); $("userName").textContent=currentUser.label; fillTaskAssigneeOptions(); fillAppointmentOptions(); updateAccessVisibility(); showApp(); renderShiftServiceOptions(); bindAllPhoneMasks(); setTaskNotice(""); setScheduleNotice(""); setShiftNotice(""); setSlotPickerNotice(""); resetShiftForm();
@@ -4363,81 +4354,99 @@ function renderControlLog(){const log=getActionLog(); $("controlLog").innerHTML 
 function renderControl(){if(!currentUser||currentUser.id!=="alexey") return; renderControlSummary(); renderControlTeam(); renderControlIssues(); renderControlLog()}
 async function manualReloadData(){addActionLog("Перезагружены данные", currentUser?currentUser.label:""); await initDataAndRealtime()}
 
-const PIN_CODES = {
-  alexey:"1111", anna:"2222", natalia:"3333", mikhail:"4444", daria:"5555",
-  dmitry:"6666", natalya:"7777", david:"8888", assistant1:"9999", assistant2:"0000"
-};
-let pinAuthUserId = null;
-let pinAuthBusy = false;
-function setPinAuthNotice(text,type=""){
-  const box=$("pinAuthNotice");
+const PIN_AUTH_KEY = "clinic_crm_pin_auth_user";
+let pinSelectedUserId = null;
+let pinLoginInFlight = false;
+
+function setPinLoginNotice(message, isError=false){
+  const box = $("pinLoginNotice");
   if(!box) return;
-  box.className="pin-auth-notice"+(type?(" "+type):"");
-  box.textContent=text||"";
+  box.textContent = message || "";
+  box.style.color = isError ? "#9d1f1f" : "";
 }
-function openPinModal(userId){
-  clearLoginError();
-  if(!USERS[userId]){showLoginError("Неизвестный пользователь"); return}
-  pinAuthUserId=userId;
-  $("pinAuthSelectedUser").textContent=USERS[userId].label;
-  $("pinAuthInput").value="";
-  setPinAuthNotice("");
-  $("pinAuthModal").classList.add("active");
-  setTimeout(()=>{$("pinAuthInput").focus()},30);
-}
-function closePinAuthModal(){
-  if(pinAuthBusy) return;
-  $("pinAuthModal").classList.remove("active");
-  pinAuthUserId=null;
-  $("pinAuthInput").value="";
-  setPinAuthNotice("");
-}
-function handlePinAuthBackdrop(event){
-  if(event.target===$("pinAuthModal")) closePinAuthModal();
-}
-async function verifyPinAgainstSupabase(userId,pin){
-  try{
-    if(!sb) sb=createClient();
-    const {data,error}=await sb.from("users").select("login,pin_code,is_active").eq("login",userId).eq("pin_code",pin).eq("is_active",true).maybeSingle();
-    if(error) throw error;
-    return !!data;
-  }catch(error){
-    console.warn("pin verify fallback", error);
-    return PIN_CODES[userId]===String(pin);
+
+function openPinLogin(userId){
+  if(!USERS[userId]){ 
+    $("loginError").style.display = "block";
+    $("loginError").textContent = "Неизвестный пользователь";
+    return; 
   }
+  pinSelectedUserId = userId;
+  $("loginError").style.display = "none";
+  $("loginError").textContent = "";
+  $("pinLoginUserLabel").textContent = USERS[userId].label;
+  $("pinLoginInput").value = "";
+  setPinLoginNotice("");
+  $("pinLoginModal").classList.add("active");
+  setTimeout(()=>{ try{$("pinLoginInput").focus()}catch(e){} }, 30);
 }
-async function submitPinAuth(){
-  if(pinAuthBusy) return;
-  if(!pinAuthUserId||!USERS[pinAuthUserId]){setPinAuthNotice("Пользователь не выбран.","error"); return}
-  const pin=String($("pinAuthInput").value||"").trim();
-  if(!pin){setPinAuthNotice("Введите PIN-код.","error"); return}
-  pinAuthBusy=true;
-  setPinAuthNotice("Проверка...","pending");
+
+function closePinLogin(){
+  if(pinLoginInFlight) return;
+  $("pinLoginModal").classList.remove("active");
+  pinSelectedUserId = null;
+  $("pinLoginInput").value = "";
+  setPinLoginNotice("");
+}
+
+async function submitPinLogin(){
+  if(pinLoginInFlight) return;
+  if(!pinSelectedUserId || !USERS[pinSelectedUserId]){
+    setPinLoginNotice("Неизвестный пользователь", true);
+    return;
+  }
+  const pin = ($("pinLoginInput").value || "").trim();
+  if(!pin){
+    setPinLoginNotice("Введите PIN-код", true);
+    return;
+  }
+
+  pinLoginInFlight = true;
+  $("pinLoginSubmitBtn").disabled = true;
+  setPinLoginNotice("Проверка...");
+
   try{
-    const ok=await verifyPinAgainstSupabase(pinAuthUserId,pin);
-    if(!ok){setPinAuthNotice("Неверный PIN для выбранного пользователя.","error"); return}
-    localStorage.setItem("clinic_crm_pin_auth_user",pinAuthUserId);
-    localStorage.setItem("clinic_crm_user",pinAuthUserId);
-    $("pinAuthModal").classList.remove("active");
-    await loginAsInternal(pinAuthUserId);
-    pinAuthUserId=null;
-    $("pinAuthInput").value="";
-    setPinAuthNotice("");
+    if(!sb) sb = createClient();
+    const { data, error } = await sb
+      .from("users")
+      .select("login,pin_code,is_active")
+      .eq("login", pinSelectedUserId)
+      .eq("pin_code", pin)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if(error){
+      console.error("PIN auth error", error);
+      setPinLoginNotice("Ошибка проверки PIN", true);
+      return;
+    }
+    if(!data){
+      setPinLoginNotice("Неверный PIN-код", true);
+      return;
+    }
+
+    localStorage.setItem(PIN_AUTH_KEY, pinSelectedUserId);
+    if($("pinLoginModal")) $("pinLoginModal").classList.remove("active");
+    pinSelectedUserId = null;
+    if($("pinLoginInput")) $("pinLoginInput").value = "";
+    setPinLoginNotice("");
+    await loginAs(localStorage.getItem(PIN_AUTH_KEY));
   }catch(error){
-    console.error("pin auth error", error);
-    setPinAuthNotice("Не удалось проверить PIN.","error");
+    console.error("submitPinLogin", error);
+    setPinLoginNotice("Не удалось войти", true);
   }finally{
-    pinAuthBusy=false;
+    pinLoginInFlight = false;
+    if($("pinLoginSubmitBtn")) $("pinLoginSubmitBtn").disabled = false;
   }
 }
+
 window.addEventListener("keydown",(event)=>{
-  const modal=$("pinAuthModal");
-  if(!modal || !modal.classList.contains("active")) return;
-  if(event.key==="Escape") closePinAuthModal();
-  if(event.key==="Enter") submitPinAuth();
+  if(event.key==="Escape" && $("pinLoginModal") && $("pinLoginModal").classList.contains("active")){
+    closePinLogin();
+  }
 });
 
-window.addEventListener("load",()=>{bindAppointmentFormSyncGuards(); bindAllPhoneMasks(); const pinSaved=localStorage.getItem("clinic_crm_pin_auth_user"); localStorage.removeItem("clinic_crm_user"); if(pinSaved&&USERS[pinSaved]) loginAsInternal(pinSaved)});
+window.addEventListener("load",()=>{bindAppointmentFormSyncGuards(); bindAllPhoneMasks(); const saved=localStorage.getItem("clinic_crm_user"); const pinSaved=localStorage.getItem(PIN_AUTH_KEY); if(saved&&pinSaved&&saved===pinSaved&&USERS[saved]) loginAs(saved)});
 </script>
 </body>
 </html>
