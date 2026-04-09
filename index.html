@@ -211,6 +211,18 @@ button{-webkit-tap-highlight-color:transparent}
 .stats-period-manual{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
 .stats-period-actions{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
 .stats-period-actions .top-btn{min-height:46px}
+
+.chat-head-right{display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.presence-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;min-width:min(100%,420px);max-width:560px}
+.presence-card{border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.06);min-width:0}
+.presence-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.presence-name{font-size:13px;font-weight:900}
+.presence-dot{width:10px;height:10px;border-radius:50%;background:#b9b0c7;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.22)}
+.presence-dot.online{background:#2f6f46;box-shadow:0 0 0 3px rgba(47,111,70,.14)}
+.presence-dot.recent{background:#d08a1a;box-shadow:0 0 0 3px rgba(208,138,26,.14)}
+.presence-meta{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.45}
+.msg-read-meta{margin-top:4px;font-size:11px;opacity:.8;text-align:right}
+.msg-read-meta.dim{opacity:.58}
 @media (max-width:700px){.tasks-toolbar{grid-template-columns:1fr}.schedule-toolbar{grid-template-columns:1fr}.patients-layout,.patient-profile-grid,.patient-data-grid,.patients-toolbar,.stats-period-manual{grid-template-columns:1fr}.login-grid{grid-template-columns:1fr}.input-wrap{flex-direction:column}.send-btn{width:100%}.msg{max-width:92%}.topbar{align-items:flex-start}.tabs{position:sticky;top:0;z-index:6;padding-top:6px;background:linear-gradient(180deg,var(--bg) 0%,rgba(0,0,0,0) 100%)}}
 </style>
 </head>
@@ -316,6 +328,9 @@ button{-webkit-tap-highlight-color:transparent}
           <div class="chat-head-left">
             <div class="chat-title">Общий чат</div>
             <div id="chatStatus" class="chat-status">подключение...</div>
+          </div>
+          <div id="chatHeadRight" class="chat-head-right hidden">
+            <div id="presencePanel" class="presence-panel"></div>
           </div>
         </div>
         <div class="chat-shell">
@@ -2366,7 +2381,7 @@ function setScheduleFormVisibility(){
 function switchTab(tab){
   const ids=["chatSection","tasksSection","controlSection","scheduleSection","shiftsSection","patientsSection","statsSection"]; ids.forEach(id=>$(id) && $(id).classList.remove("active"));
   ["chatTabBtn","tasksTabBtn","controlTabBtn","scheduleTabBtn","shiftsTabBtn","patientsTabBtn","statsTabBtn"].forEach(id=>$(id) && $(id).classList.remove("active"));
-  if(tab==="chat"&&currentUser&&currentUser.canChat){$("chatSection").classList.add("active"); $("chatTabBtn").classList.add("active"); return}
+  if(tab==="chat"&&currentUser&&currentUser.canChat){$("chatSection").classList.add("active"); $("chatTabBtn").classList.add("active"); renderPresencePanel(); setTimeout(()=>{markMessagesAsRead();},80); return}
   if(tab==="control"&&currentUser&&currentUser.id==="alexey"){$("controlSection").classList.add("active"); $("controlTabBtn").classList.add("active"); renderControl(); return}
   if(tab==="schedule"&&currentUser&&(currentUser.id==="mikhail"||currentUser.id==="alexey"||currentUser.role==="admin"||currentUser.role==="doctor"||currentUser.role==="assistant")){$("scheduleSection").classList.add("active"); $("scheduleTabBtn").classList.add("active"); renderSchedule(); return}
   if(tab==="shifts"&&canManageShifts()){$("shiftsSection").classList.add("active"); $("shiftsTabBtn").classList.add("active"); renderShifts(); return}
@@ -2387,6 +2402,7 @@ function updateAccessVisibility(){
   if(currentUser&&(currentUser.id==="mikhail"||currentUser.id==="alexey")){statsTabBtn.classList.remove("hidden")}
   ["taskTitle","taskDesc","taskAssignee","taskStatus","taskDue"].forEach(id=>$(id).disabled = !(currentUser&&currentUser.canCreateTasks));
   setScheduleFormVisibility();
+  renderPresencePanel();
   if(currentUser&&!currentUser.canChat){switchTab(currentUser.role==="assistant"?"schedule":"tasks")}
 }
 async function loginAs(userId){
@@ -2396,13 +2412,21 @@ async function loginAs(userId){
     if(!sb) sb=createClient();
     addActionLog("Вход в систему", currentUser.label);
     await initDataAndRealtime();
+    startPresenceTimers();
   }catch(error){
     console.error("login init error", error);
     if(currentUser){showApp(); setChatStatus(currentUser.canChat?"ошибка сети, пытаюсь переподключиться...":"чат отключен для этой роли"); scheduleReconnect("login"); return}
     showLoginError("Не удалось войти.\n"+(error?.message||"Неизвестная ошибка")); showLogin();
   }
 }
-async function logout(){await stopRealtime(); addActionLog("Выход из системы", currentUser?currentUser.label:""); currentUser=null; messagesCache=[]; tasksCache=[]; shiftsCache=[]; clearReconnectTimer(); applyTheme(null); localStorage.removeItem("clinic_crm_user"); localStorage.removeItem("clinic_crm_pin_auth_user"); $("chatWrap").innerHTML=""; $("tasksList").innerHTML=""; $("controlSummary").innerHTML=""; $("controlTeam").innerHTML=""; $("controlIssues").innerHTML=""; $("controlLog").innerHTML=""; $("scheduleList").innerHTML=""; if($("shiftsList")) $("shiftsList").innerHTML=""; $("patientsList").innerHTML=""; $("patientProfile").innerHTML=""; $("statsList").innerHTML=""; showLogin(); setTaskNotice(""); setScheduleNotice(""); setShiftNotice("")}
+async function logout(){
+  try{
+    if(currentUser && sb && presenceFeatureAvailable){
+      await sb.from("chat_presence").upsert({user_id: currentUser.id, user_name: currentUser.label, role: currentUser.role, updated_at: new Date(Date.now()-601000).toISOString(), last_seen_at: new Date().toISOString()},{onConflict:"user_id"});
+    }
+  }catch(error){console.warn("presence logout failed", error)}
+  stopPresenceTimers();
+  await stopRealtime(); addActionLog("Выход из системы", currentUser?currentUser.label:""); currentUser=null; messagesCache=[]; tasksCache=[]; shiftsCache=[]; presenceCache=[]; messageReadsCache=[]; clearReconnectTimer(); applyTheme(null); localStorage.removeItem("clinic_crm_user"); localStorage.removeItem("clinic_crm_pin_auth_user"); $("chatWrap").innerHTML=""; $("tasksList").innerHTML=""; $("controlSummary").innerHTML=""; $("controlTeam").innerHTML=""; $("controlIssues").innerHTML=""; $("controlLog").innerHTML=""; $("scheduleList").innerHTML=""; if($("shiftsList")) $("shiftsList").innerHTML=""; $("patientsList").innerHTML=""; $("patientProfile").innerHTML=""; $("statsList").innerHTML=""; renderPresencePanel(); showLogin(); setTaskNotice(""); setScheduleNotice(""); setShiftNotice("")}
 async function stopRealtime(){
   stopPolling();try{if(chatChannel&&sb) await sb.removeChannel(chatChannel)}catch(e){console.warn(e)} try{if(taskChannel&&sb) await sb.removeChannel(taskChannel)}catch(e){console.warn(e)}
   try{if(appointmentChannel&&sb) await sb.removeChannel(appointmentChannel)}catch(e){console.warn(e)}
@@ -2712,7 +2736,7 @@ function buildMessageElements(row){
     ${makeEffectsFor(userClass)}
     <div class="msg-head">${escapeHtml(row.user || "")}</div>
     <div class="msg-text">${escapeHtml(row.text || "")}</div>
-    <div class="msg-meta">${escapeHtml(formatTime(row.created_at))}</div>
+    <div class="msg-meta">${escapeHtml(formatTime(row.created_at))}</div>${canSeeChatPresence() && mine ? `<div class="msg-read-meta ${getReadersForMessage(row).length ? "" : "dim"}">${escapeHtml(buildReadMetaText(row))}</div>` : ""}
   `;
   line.appendChild(msg);
   return { line, msg, userClass };
@@ -2742,6 +2766,7 @@ function appendMessageRow(row, scrollMode="smart"){
   if(scrollMode === "force" || (scrollMode === "smart" && atBottom)){
     wrap.scrollTop = wrap.scrollHeight;
   }
+  setTimeout(()=>{ markMessagesAsRead(); }, 60);
 }
 function updateMessageRow(row){
   const wrap = $("chatWrap");
@@ -2756,9 +2781,21 @@ function updateMessageRow(row){
     const head = msg.querySelector(".msg-head");
     const textNode = msg.querySelector(".msg-text");
     const meta = msg.querySelector(".msg-meta");
+    let readMeta = msg.querySelector(".msg-read-meta");
     if(head) head.textContent = row.user || "";
     if(textNode) textNode.textContent = row.text || "";
     if(meta) meta.textContent = formatTime(row.created_at);
+    if(canSeeChatPresence() && mine){
+      if(!readMeta){
+        readMeta = document.createElement("div");
+        readMeta.className = "msg-read-meta";
+        msg.appendChild(readMeta);
+      }
+      readMeta.className = `msg-read-meta ${getReadersForMessage(row).length ? "" : "dim"}`.trim();
+      readMeta.textContent = buildReadMetaText(row);
+    }else if(readMeta){
+      readMeta.remove();
+    }
   }
   return true;
 }
@@ -2779,6 +2816,8 @@ function renderMessages(){
   const sorted=[...messagesCache].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
   wrap.innerHTML = "";
   sorted.forEach((row)=>appendMessageRow(row, "force"));
+  renderPresencePanel();
+  setTimeout(()=>{ markMessagesAsRead(); }, 80);
 }
 function upsertMessageLocally(row){
   const id = String(row.id);
@@ -2819,6 +2858,7 @@ async function loadMessages(){
   if(error) throw error;
   messagesCache=data||[];
   renderMessages();
+  if(canSeeChatPresence()) await loadPresenceAndReads();
 }
 function attachChannelStatus(channel,type){
   channel.subscribe((status)=>{
@@ -3365,7 +3405,7 @@ async function reconnect(){
   if(Date.now() - lastReconnectAt < 8000) return;
   lastReconnectAt = Date.now();
   reconnectInFlight=true;
-  try{await stopRealtime(); sb=createClient(); if(currentUser.canChat){await loadMessages(); startMessagesRealtime(); setChatStatus("чат переподключен")} else {renderNoChatState(); setChatStatus("чат отключен для этой роли")} await loadTasks(); startTasksRealtime(); await loadAppointments(); startAppointmentsRealtime(); await loadPatientCards(); await loadPatientCardHistory(); await loadPatients(); await loadShifts(); startPolling(); renderControl(); renderSchedule(); renderShifts(); renderPatients(); renderStats();}catch(error){console.error("reconnect error",error); setChatStatus("ошибка переподключения"); scheduleReconnect("повтор")}finally{reconnectInFlight=false}}
+  try{await stopRealtime(); sb=createClient(); if(currentUser.canChat){await loadMessages(); startMessagesRealtime(); setChatStatus("чат переподключен")} else {renderNoChatState(); setChatStatus("чат отключен для этой роли")} await loadTasks(); startTasksRealtime(); await loadAppointments(); startAppointmentsRealtime(); await loadPatientCards(); await loadPatientCardHistory(); await loadPatients(); await loadShifts(); startPolling(); renderControl(); renderSchedule(); renderShifts(); renderPatients(); renderStats(); startPresenceTimers();}catch(error){console.error("reconnect error",error); setChatStatus("ошибка переподключения"); scheduleReconnect("повтор")}finally{reconnectInFlight=false}}
 function handleMessageKey(event){if(event.key==="Enter"){event.preventDefault(); sendMessage()}}
 async function sendMessage(){
   if(!currentUser||!currentUser.canChat) return;
@@ -3398,6 +3438,8 @@ async function sendMessage(){
   }
 
   setChatStatus("чат подключен");
+  updateOwnPresence();
+  setTimeout(()=>{ markMessagesAsRead(); }, 80);
   addActionLog("Отправлено сообщение", `${currentUser.label}: ${text.slice(0,50)}`);
 }
 async function loadTasks(){
@@ -4358,6 +4400,174 @@ const PIN_AUTH_KEY = "clinic_crm_pin_auth_user";
 let pinSelectedUserId = null;
 let pinLoginInFlight = false;
 
+let presenceHeartbeatTimer = null;
+let presenceRefreshTimer = null;
+let presenceCache = [];
+let messageReadsCache = [];
+let presenceFeatureAvailable = true;
+let readsFeatureAvailable = true;
+let lastReadMarkAt = 0;
+const CHAT_VISIBLE_USERS = Object.values(USERS).filter(user=>user.canChat).map(user=>user.id);
+
+
+function canSeeChatPresence(){return !!(currentUser && currentUser.id==="alexey");}
+function getChatUserByLabel(label){return Object.values(USERS).find(item=>String(item.label)===String(label)) || null}
+function formatRelativePresence(value){
+  if(!value) return "нет данных";
+  const diffSec = Math.max(0, Math.floor((Date.now() - new Date(value).getTime())/1000));
+  if(diffSec < 90) return "онлайн";
+  if(diffSec < 3600) return `был(а) ${Math.max(1, Math.floor(diffSec/60))} мин назад`;
+  if(diffSec < 86400) return `сегодня в ${formatTime(value)}`;
+  return formatDateTime(value);
+}
+function getPresenceState(row){
+  if(!row || !row.updated_at) return "offline";
+  const diff = Date.now() - new Date(row.updated_at).getTime();
+  if(diff <= 90000) return "online";
+  if(diff <= 600000) return "recent";
+  return "offline";
+}
+async function updateOwnPresence(){
+  try{
+    if(!currentUser || !sb) return;
+    const payload = {
+      user_id: currentUser.id,
+      user_name: currentUser.label,
+      role: currentUser.role,
+      updated_at: new Date().toISOString(),
+      last_seen_at: new Date().toISOString()
+    };
+    const { error } = await sb.from("chat_presence").upsert(payload, { onConflict: "user_id" });
+    if(error) throw error;
+  }catch(error){
+    presenceFeatureAvailable = false;
+    console.warn("presence update failed", error);
+  }
+}
+function stopPresenceTimers(){
+  if(presenceHeartbeatTimer){clearInterval(presenceHeartbeatTimer); presenceHeartbeatTimer=null;}
+  if(presenceRefreshTimer){clearInterval(presenceRefreshTimer); presenceRefreshTimer=null;}
+}
+function startPresenceTimers(){
+  stopPresenceTimers();
+  if(!currentUser || !currentUser.canChat || !presenceFeatureAvailable) return;
+  updateOwnPresence();
+  presenceHeartbeatTimer = setInterval(()=>{ updateOwnPresence(); }, 30000);
+  if(canSeeChatPresence()){
+    loadPresenceAndReads();
+    presenceRefreshTimer = setInterval(()=>{ loadPresenceAndReads(); }, 10000);
+  }
+}
+async function loadPresenceData(){
+  if(!sb || !canSeeChatPresence()) return;
+  try{
+    const { data, error } = await sb.from("chat_presence").select("*").in("user_id", CHAT_VISIBLE_USERS);
+    if(error) throw error;
+    presenceFeatureAvailable = true;
+    presenceCache = Array.isArray(data) ? data : [];
+  }catch(error){
+    presenceFeatureAvailable = false;
+    console.warn("presence load failed", error);
+  }
+}
+async function loadMessageReadsData(){
+  if(!sb || !canSeeChatPresence()) return;
+  try{
+    const { data, error } = await sb.from("message_reads").select("*").in("user_id", CHAT_VISIBLE_USERS).order("read_at", {ascending:false}).limit(3000);
+    if(error) throw error;
+    readsFeatureAvailable = true;
+    messageReadsCache = Array.isArray(data) ? data : [];
+  }catch(error){
+    readsFeatureAvailable = false;
+    console.warn("message reads load failed", error);
+  }
+}
+function renderPresencePanel(){
+  const headRight = $("chatHeadRight");
+  const panel = $("presencePanel");
+  if(!headRight || !panel) return;
+  if(!canSeeChatPresence()){
+    headRight.classList.add("hidden");
+    panel.innerHTML = "";
+    return;
+  }
+  headRight.classList.remove("hidden");
+  const users = CHAT_VISIBLE_USERS.filter(id=>id!=="alexey").map(id=>USERS[id]).filter(Boolean);
+  panel.innerHTML = users.map(user=>{
+    const row = presenceCache.find(item=>String(item.user_id||"")===String(user.id)) || null;
+    const state = getPresenceState(row);
+    const stateLabel = state==="online" ? "онлайн" : state==="recent" ? "недавно" : "не в сети";
+    const lastSeen = row ? formatRelativePresence(row.last_seen_at || row.updated_at) : "нет данных";
+    return `<div class="presence-card">
+      <div class="presence-top">
+        <div class="presence-name">${escapeHtml(user.label)}</div>
+        <span class="presence-dot ${escapeHtml(state)}" title="${escapeHtml(stateLabel)}"></span>
+      </div>
+      <div class="presence-meta">${escapeHtml(stateLabel)} · ${escapeHtml(lastSeen)}</div>
+    </div>`;
+  }).join("");
+}
+function getReadersForMessage(row){
+  if(!Array.isArray(messageReadsCache) || !row) return [];
+  const chatUsers = CHAT_VISIBLE_USERS.filter(id=>id!=="alexey");
+  return chatUsers.filter(userId=>{
+    const user = USERS[userId];
+    if(!user) return false;
+    const userReads = messageReadsCache.filter(item=>String(item.user_id||"")===String(userId));
+    return userReads.some(item=>{
+      if(!item.message_created_at) return false;
+      return new Date(item.message_created_at).getTime() >= new Date(row.created_at).getTime();
+    });
+  }).map(userId=>USERS[userId].label);
+}
+function buildReadMetaText(row){
+  if(!canSeeChatPresence()) return "";
+  const mine = currentUser && row.user===currentUser.label;
+  if(!mine) return "";
+  const readers = getReadersForMessage(row);
+  const pending = CHAT_VISIBLE_USERS.filter(id=>id!=="alexey" && USERS[id]).map(id=>USERS[id].label).filter(label=>!readers.includes(label));
+  if(readers.length && pending.length){
+    return `Прочитали: ${readers.join(", ")} · не прочитали: ${pending.join(", ")}`;
+  }
+  if(readers.length){
+    return `Прочитали: ${readers.join(", ")}`;
+  }
+  return "Пока не прочитано";
+}
+async function loadPresenceAndReads(){
+  if(!canSeeChatPresence()) return;
+  await loadPresenceData();
+  await loadMessageReadsData();
+  renderPresencePanel();
+  renderMessages();
+}
+async function markMessagesAsRead(){
+  try{
+    if(!currentUser || !currentUser.canChat || !sb || !readsFeatureAvailable) return;
+    if(document.hidden) return;
+    const chatSection = $("chatSection");
+    if(!chatSection || !chatSection.classList.contains("active")) return;
+    const now = Date.now();
+    if(now - lastReadMarkAt < 1200) return;
+    lastReadMarkAt = now;
+    const rows = (messagesCache || []).filter(item=>String(item.user||"")!==String(currentUser.label||""));
+    if(!rows.length) return;
+    const payload = rows.map(item=>({
+      user_id: currentUser.id,
+      user_name: currentUser.label,
+      message_id: String(item.id),
+      message_created_at: item.created_at,
+      read_at: new Date().toISOString()
+    }));
+    const { error } = await sb.from("message_reads").upsert(payload, { onConflict: "user_id,message_id" });
+    if(error) throw error;
+    if(canSeeChatPresence()) await loadMessageReadsData();
+  }catch(error){
+    readsFeatureAvailable = false;
+    console.warn("mark read failed", error);
+  }
+}
+
 function setPinLoginNotice(message, isError=false){
   const box = $("pinLoginNotice");
   if(!box) return;
@@ -4387,6 +4597,23 @@ function closePinLogin(){
   pinSelectedUserId = null;
   $("pinLoginInput").value = "";
   setPinLoginNotice("");
+}
+
+async function logLoginAttempt(userId, success){
+  try{
+    if(!userId) return;
+    if(!sb) sb = createClient();
+    const payload = {
+      user_id: String(userId),
+      success: !!success,
+      user_agent: navigator.userAgent || null,
+      ip: null
+    };
+    const { error } = await sb.from("login_logs").insert(payload);
+    if(error) throw error;
+  }catch(error){
+    console.warn("login log failed", error);
+  }
 }
 
 async function submitPinLogin(){
@@ -4421,10 +4648,12 @@ async function submitPinLogin(){
       return;
     }
     if(!data){
+      await logLoginAttempt(pinSelectedUserId, false);
       setPinLoginNotice("Неверный PIN-код", true);
       return;
     }
 
+    await logLoginAttempt(pinSelectedUserId, true);
     localStorage.setItem(PIN_AUTH_KEY, pinSelectedUserId);
     if($("pinLoginModal")) $("pinLoginModal").classList.remove("active");
     pinSelectedUserId = null;
@@ -4446,7 +4675,29 @@ window.addEventListener("keydown",(event)=>{
   }
 });
 
-window.addEventListener("load",()=>{bindAppointmentFormSyncGuards(); bindAllPhoneMasks(); const saved=localStorage.getItem("clinic_crm_user"); const pinSaved=localStorage.getItem(PIN_AUTH_KEY); if(saved&&pinSaved&&saved===pinSaved&&USERS[saved]) loginAs(saved)});
+window.addEventListener("load",()=>{
+  bindAppointmentFormSyncGuards();
+  bindAllPhoneMasks();
+  const wrap = $("chatWrap");
+  if(wrap){
+    wrap.addEventListener("scroll", ()=>{ markMessagesAsRead(); }, {passive:true});
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!document.hidden){
+      updateOwnPresence();
+      markMessagesAsRead();
+      if(canSeeChatPresence()) loadPresenceAndReads();
+    }
+  });
+  window.addEventListener("beforeunload", ()=>{
+    try{
+      stopPresenceTimers();
+    }catch(e){}
+  });
+  const saved=localStorage.getItem("clinic_crm_user");
+  const pinSaved=localStorage.getItem(PIN_AUTH_KEY);
+  if(saved&&pinSaved&&saved===pinSaved&&USERS[saved]) loginAs(saved)
+});
 </script>
 </body>
 </html>
