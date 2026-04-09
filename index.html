@@ -4743,6 +4743,16 @@ function closePinLogin(){
   setPinLoginNotice("");
 }
 
+function withTimeout(promise, ms, message="Тайм-аут операции"){
+  let timer = null;
+  return Promise.race([
+    promise,
+    new Promise((_, reject)=>{
+      timer = setTimeout(()=>reject(new Error(message)), ms);
+    })
+  ]).finally(()=>{ if(timer) clearTimeout(timer); });
+}
+
 async function logLoginAttempt(userId, success){
   try{
     if(!userId) return;
@@ -4753,7 +4763,11 @@ async function logLoginAttempt(userId, success){
       user_agent: navigator.userAgent || null,
       ip: null
     };
-    const { error } = await sb.from("login_logs").insert(payload);
+    const { error } = await withTimeout(
+      sb.from("login_logs").insert(payload),
+      3500,
+      "login log timeout"
+    );
     if(error) throw error;
   }catch(error){
     console.warn("login log failed", error);
@@ -4773,18 +4787,22 @@ async function submitPinLogin(){
   }
 
   pinLoginInFlight = true;
-  $("pinLoginSubmitBtn").disabled = true;
+  if($("pinLoginSubmitBtn")) $("pinLoginSubmitBtn").disabled = true;
   setPinLoginNotice("Проверка...");
 
   try{
     if(!sb) sb = createClient();
-    const { data, error } = await sb
-      .from("users")
-      .select("login,pin_code,is_active")
-      .eq("login", pinSelectedUserId)
-      .eq("pin_code", pin)
-      .eq("is_active", true)
-      .maybeSingle();
+    const { data, error } = await withTimeout(
+      sb
+        .from("users")
+        .select("login,pin_code,is_active")
+        .eq("login", pinSelectedUserId)
+        .eq("pin_code", pin)
+        .eq("is_active", true)
+        .maybeSingle(),
+      7000,
+      "pin auth timeout"
+    );
 
     if(error){
       console.error("PIN auth error", error);
@@ -4792,21 +4810,24 @@ async function submitPinLogin(){
       return;
     }
     if(!data){
-      await logLoginAttempt(pinSelectedUserId, false);
+      logLoginAttempt(pinSelectedUserId, false);
       setPinLoginNotice("Неверный PIN-код", true);
       return;
     }
 
-    await logLoginAttempt(pinSelectedUserId, true);
     localStorage.setItem(PIN_AUTH_KEY, pinSelectedUserId);
     if($("pinLoginModal")) $("pinLoginModal").classList.remove("active");
     pinSelectedUserId = null;
     if($("pinLoginInput")) $("pinLoginInput").value = "";
     setPinLoginNotice("");
+    logLoginAttempt(localStorage.getItem(PIN_AUTH_KEY), true);
     await loginAs(localStorage.getItem(PIN_AUTH_KEY));
   }catch(error){
     console.error("submitPinLogin", error);
-    setPinLoginNotice("Не удалось войти", true);
+    const msg = String(error && error.message || "").includes("timeout")
+      ? "Слишком долгое соединение. Попробуй ещё раз"
+      : "Не удалось войти";
+    setPinLoginNotice(msg, true);
   }finally{
     pinLoginInFlight = false;
     if($("pinLoginSubmitBtn")) $("pinLoginSubmitBtn").disabled = false;
@@ -4816,6 +4837,10 @@ async function submitPinLogin(){
 window.addEventListener("keydown",(event)=>{
   if(event.key==="Escape" && $("pinLoginModal") && $("pinLoginModal").classList.contains("active")){
     closePinLogin();
+  }
+  if(event.key==="Enter" && $("pinLoginModal") && $("pinLoginModal").classList.contains("active")){
+    event.preventDefault();
+    submitPinLogin();
   }
 });
 
